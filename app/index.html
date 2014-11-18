@@ -18,14 +18,7 @@
 	</head>
 	<body>
 
-		<div class="hero-unit">
-			<h1>'Allo, 'Allo!</h1>
-			<p>You now have</p>
-			<ul>
-				<li>HTML5 Boilerplate</li>
-				<li>Sass</li>
-			</ul>
-		</div>
+		<canvas id="main-canvas"></canvas>
 
 
 		<!-- build:js scripts/vendor.js -->
@@ -34,8 +27,11 @@
 		<!-- endbower -->
 		<!-- endbuild -->
 
-        <!-- build:js scripts/main.js -->
-        <script src="scripts/main.js"></script>
-        <!-- endbuild -->
+		<script>window.M = {};</script>
+		<!-- build:js scripts/main.js -->
+		<script src="scripts/clock.js"></script>
+		<script src="scripts/map.js"></script>
+		<script src="scripts/main.js"></script>
+		<!-- endbuild -->
 </body>
 </html>
