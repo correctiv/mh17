@@ -5,9 +5,20 @@ window.M.map = (function () {
 
 	var canvas, $canvas, ctx;
 
+	var baseImageData;
+
 	// For high-resolution displays where 1px != 1 device pixel
 	function s (px) {
 		return px * window.devicePixelRatio;
+	}
+
+	function _pluralize (fn) {
+		return function pluralized (elements) {
+			elements.forEach(function (element) {
+				if (!element) return;
+				fn(element);
+			});
+		}
 	}
 
 	// https://gist.github.com/RandomEtc/668577
@@ -84,6 +95,12 @@ window.M.map = (function () {
 		o.bounds.bottom = yRel(bottomRight);
 	}
 
+	function fillCircle (x, y, r) {
+		ctx.beginPath();
+		ctx.arc(s(x), s(y), s(r), 0, 2 * Math.PI);
+		ctx.fill();
+	}
+
 
 	function init (c, options) {
 		canvas = c;
@@ -102,24 +119,45 @@ window.M.map = (function () {
 			renderPath[feature.geometry.type].call(ctx, feature.geometry.coordinates);
 			ctx.fill();
 		});
+		checkpoint();
 	}
 
-	function drawFlightRoutes (flights) {
-		flights.forEach(function (flight) {
-			ctx.beginPath();
-			var route = flight[3].map(function(pt) {
-				return [pt[1], pt[2]];
-			})
-			ctx.moveTo(s(x(route[0])), s(y(route[0])));
-			route.slice(1).forEach(function (point) {
-				ctx.lineTo(s(x(point)), s(y(point)));
-			});
-			ctx.stroke();
+	function drawFlightRoute (flight) {
+		ctx.beginPath();
+		var route = flight[3].map(function(pt) {
+			return [pt[1], pt[2]];
+		})
+		ctx.moveTo(s(x(route[0])), s(y(route[0])));
+		route.slice(1).forEach(function (point) {
+			ctx.lineTo(s(x(point)), s(y(point)));
 		});
+		ctx.stroke();
+	}
+
+	function drawFlight (flight) {
+		var pos = [flight.position[1], flight.position[2]];
+		fillCircle(x(pos), y(pos), 5);
+	}
+
+	function checkpoint () {
+		baseImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	}
+
+	function clear () {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		if (baseImageData) ctx.putImageData(baseImageData, 0, 0);
+		ctx.fillStyle = '#000';
 	}
 
 	module.init = init;
 	module.drawGeoJSON = drawGeoJSON;
-	module.drawFlightRoutes = drawFlightRoutes;
+	module.clear = clear;
+	module.draw = {
+		geoJSON: drawGeoJSON,
+		flight: drawFlight,
+		flights: _pluralize(drawFlight),
+		flightRoute: drawFlightRoute,
+		flightRoutes: _pluralize(drawFlightRoute)
+	};
 	return module;
 })();
