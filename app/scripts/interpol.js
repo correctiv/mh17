@@ -1,22 +1,25 @@
 (function () {
 var undefined;
 
+function OutOfRange () { };
+var BeforeStart = new OutOfRange();
+var AfterEnd = new OutOfRange();
+
 /* Usage:
-var interpolate = new Interpol( [[0, 0], [5, 10]], [{ name: 'time', key: 0 }] );
-interpolate.by.time(2); //=> [2, 4];
+var interpolate = new Interpol( [[0, 0], [5, 10]], 0 );
+interpolate.by(2); //=> [2, 4];
 */
 
 function makeNewEmpty(object) {
 	return (Object.prototype.toString.call(object) === '[object Array]')? [] : {};
 }
 
-var Interpol = function (points, interpolators) {
+var Interpol = function (points, key) {
 	var me = this;
-	this.by = {};
 
 	function mix (leftPoint, rightPoint, relativePosition) {
 		var o = makeNewEmpty(leftPoint);
-		for (key in leftPoint) {
+		for (var key in leftPoint) {
 			var val = leftPoint[key] * (1 - relativePosition)
 				+ rightPoint[key] * relativePosition;
 			if (!isNaN(val)) o[key] = val;
@@ -24,27 +27,39 @@ var Interpol = function (points, interpolators) {
 		return o;
 	}
 
-	interpolators.forEach(function (i) {
-		var key = i.key;
-		var name = '' + (i.name || key);
+	function find (value) {
+		var leftIndex = points.length - 1;
 
-		function interpolate (value) {
-			var leftIndex = points.length - 1;
-			if (points[leftIndex][key] < value) return false;
-			while (leftIndex >= 0 && points[leftIndex][key] > value) {
-				leftIndex--;
-			}
-			if (leftIndex === -1) return false;
-			var rightIndex = Math.min(leftIndex + 1, points.length - 1);
+		if (points[leftIndex][key] < value) return AfterEnd;
+		if (points[0][key] > value) return BeforeStart;
 
-			var deltaRightLeft = points[rightIndex][key] - points[leftIndex][key];
-			var deltaValueLeft = value - points[leftIndex][key];
-			var relativePosition = deltaValueLeft/deltaRightLeft;
+		while (leftIndex >= 0 && points[leftIndex][key] > value) leftIndex--;
 
-			return mix(points[leftIndex], points[rightIndex], relativePosition);
-		}
-		me.by[name] = interpolate;
-	});
+		var rightIndex = Math.min(leftIndex + 1, points.length - 1);
+
+		var deltaRightLeft = points[rightIndex][key] - points[leftIndex][key];
+		var deltaValueLeft = value - points[leftIndex][key];
+		var relativePosition = deltaValueLeft/deltaRightLeft;
+
+		return [leftIndex, rightIndex, relativePosition];
+	}
+
+	function interpolate (value) {
+		var p = find(value);
+		if (p instanceof OutOfRange) return false;
+		return mix(points[p[0]], points[p[1]], p[2]);
+	}
+
+	function interpolateUpTo (value) {
+		var p = find(value);
+		if (p === BeforeStart) return false;
+		var r = points.slice(0, p[1]);
+		r.push(mix(points[p[0]], points[p[1]], p[2]));
+		return r;
+	}
+
+	this.by = interpolate;
+	this.until = interpolateUpTo;
 }
 
 window.M.Interpol = Interpol;

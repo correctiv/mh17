@@ -123,8 +123,16 @@ window.M.map = (function () {
 	}
 
 	function drawFlightRoute (flight) {
+		if (!flight.route) return;
+		ctx.lineJoin = 'round';
+		ctx.lineWidth = 3;
+		if (flight.number === 'MH17') {
+			ctx.strokeStyle = '#f00';
+		} else {
+			ctx.strokeStyle = '#000';
+		}
 		ctx.beginPath();
-		var route = flight[3].map(function(pt) {
+		var route = flight.route.map(function(pt) {
 			return [pt[1], pt[2]];
 		})
 		ctx.moveTo(s(x(route[0])), s(y(route[0])));

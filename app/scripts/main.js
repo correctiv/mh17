@@ -11,6 +11,6 @@ $.getJSON('data/flights.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);
 M.clock.on('tick', function (time) {
 	M.map.clear();
-	M.map.draw.flights(M.flights.at.time(time));
+	M.map.draw.flightRoutes(M.flights.until.time(time));
 });
 });

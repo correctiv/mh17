@@ -25,7 +25,7 @@
 		this.earliest = points[0][0];
 		this.latest = points[points.length-1][0];
 		this.points = points;
-		this.interpolate = new M.Interpol(points, [{ key: 0, name: 'time' }]);
+		this.interpolate = new M.Interpol(points, 0);
 	}
 
 	var flights = [];
@@ -51,7 +51,7 @@
 	function atTime (time) {
 		return flights.map(function (flight) {
 			if (time < flight.route.earliest || time > flight.route.latest) return;
-			var pos = flight.route.interpolate.by.time(time);
+			var pos = flight.route.interpolate.by(time);
 			return {
 				number: flight.number,
 				start: flight.start,
@@ -61,9 +61,23 @@
 		});
 	}
 
+	function untilTime (time) {
+		return flights.map(function (flight) {
+			if (time < flight.route.earliest) return;
+			var pos = flight.route.interpolate.until(time);
+			return {
+				number: flight.number,
+				start: flight.start,
+				end: flight.end,
+				route: pos
+			}
+		});
+	}
+
 	module.push = push;
 	module.pushBulk = pushBulk;
 	module.at = { time: atTime };
+	module.until = { time: untilTime };
 	module.raw = flights;
 	module.on = addEventListener;
 
