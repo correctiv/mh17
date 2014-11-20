@@ -74,12 +74,21 @@ window.M.Map = function (container, options) {
 	function y (l) { return yAbs(yRel(l)); }
 
 
-	function Layer (name) {
+	function Layer (name, options) {
 		var $canvas = $('<canvas>');
 		var canvas = $canvas[0];
 		var ctx = canvas.getContext('2d');
 		$canvas.attr('id', 'map-layer-'+name);
 		$container.append($canvas);
+		options = options || {};
+
+		var lX = x;
+		var lY = y;
+
+		if (options.projected) {
+			lX = function (pt) { return xAbs(pt[0]); };
+			lY = function (pt) { return yAbs(pt[1]); };
+		}
 
 		ctx.fillStyle = '#000';
 		ctx.strokeStyle = '#000';
@@ -87,28 +96,52 @@ window.M.Map = function (container, options) {
 		ctx.fillRect(0,0, 50, 50);
 
 		this._updateDimensions = function () {
-			_setHeight(o.height);
-			_setWidth(o.width);
+			setHeight(o.height);
+			setStyle(o.width);
 		}
 
-		_setWidth = function (w) {
+		function setStyle (w) {
 			if (w === undefined) return;
 			$canvas.attr('width', s(w));
 			$canvas.css('width', w + 'px');
 		}
 
-		_setHeight = function (h) {
+		function setHeight (h) {
 			if (h === undefined) return;
 			$canvas.attr('height', s(h));
 			$canvas.css('height', h + 'px');
 		}
 
+		var styles = (function () {
+			var backup = {};
+			function set (styles, makeBackup) {
+				if (makeBackup === undefined) makeBackup = true;
+				for (var property in styles) {
+					if (makeBackup) backup[property] = styles[property];
+					ctx[property] = styles[property];
+				}
+			}
+			function restore () {
+				set(backup, false);
+				backup = {};
+			}
+			return {
+				set: set,
+				restore: restore
+			}
+		})();
+
 		this.drawGeoJSON = function (features) {
 			features.forEach(function (feature) {
 				project[feature.type](feature);
+
+				styles.set(feature.properties.style);
 				ctx.beginPath();
 				renderPath[feature.geometry.type].call(ctx, feature.geometry.coordinates);
-				ctx.fill();
+				feature.properties.draw.forEach(function (action) {
+					ctx[action]();
+				});
+				styles.restore();
 			});
 		}
 
@@ -120,17 +153,17 @@ window.M.Map = function (container, options) {
 		}
 
 		this.moveTo = function (point) {
-			ctx.moveTo(s(x(point)), s(y(point)));
+			ctx.moveTo(s(lX(point)), s(lY(point)));
 		}
 
 		this.lineTo = function (point) {
-			ctx.lineTo(s(x(point)), s(y(point)));
+			ctx.lineTo(s(lX(point)), s(lY(point)));
 		}
 
 		this.drawCircle = function (point, r) {
-			console.log(s(x(point)), s(y(point)));
+			console.log(s(lX(point)), s(lY(point)));
 			ctx.beginPath();
-			ctx.arc(s(x(point)), s(y(point)), s(r), 0, 2 * Math.PI);
+			ctx.arc(s(lX(point)), s(lY(point)), s(r), 0, 2 * Math.PI);
 			ctx.fill();
 		}
 
@@ -147,11 +180,12 @@ window.M.Map = function (container, options) {
 			delete parent.layers[name];
 		}
 
+		this.ctx = ctx;
 		this._updateDimensions();
 	}
 
-	this.addLayer = function (name) {
-		var l = new Layer(name);
+	this.addLayer = function (name, options) {
+		var l = new Layer(name, options);
 		parent.layers[name] = l;
 		return l;
 	}

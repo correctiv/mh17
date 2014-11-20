@@ -15,6 +15,9 @@ function checkBounds (point) {
 	);
 }
 
+function xRel (l) { return l[0] / 180; }
+function yRel (l) { return Math.log(Math.tan(Math.PI/4+l[1]*(Math.PI/180)/2)) / Math.PI; }
+
 flights = flights.map(function (flight) {
 	var f = [];
 	var route = flight.route.coordinates.map(function (point, i) {
@@ -25,10 +28,17 @@ flights = flights.map(function (flight) {
 
 	if (route.length === 0) return;
 
+	route = simplify(route, .02, true);
+	route.forEach(function project (point) {
+		var x = xRel(point), y = yRel(point);
+		point[0] = x;
+		point[1] = y;
+	});
+
 	f.push(flight.flight);
 	f.push(flight.start.airport);
 	f.push(flight.end.airport);
-	f.push(simplify(route, .02, true));
+	f.push(route);
 
 	return f;
 }).filter(function (e) { return e; });

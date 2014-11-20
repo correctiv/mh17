@@ -30,6 +30,7 @@
 	}
 
 	var flights = [];
+	var currentId = 0;
 
 	function push (flight) {
 		var route = new Route(flight.pop());
@@ -37,6 +38,7 @@
 		latest = Math.max(latest, route.latest);
 
 		flights.push({
+			id: (currentId++),
 			number: flight.shift(),
 			start: flight.shift(),
 			end: flight.shift(),
@@ -54,25 +56,24 @@
 			if (time < flight.route.earliest || time > flight.route.latest) return;
 			var pos = flight.route.interpolate.by(time);
 			return {
-				number: flight.number,
-				start: flight.start,
-				end: flight.end,
+				object: flight,
 				position: pos
 			}
 		});
 	}
 
 	function untilTime (time) {
-		return flights.map(function (flight) {
+		var r = { underway: [], arrived: [] };
+		flights.forEach(function (flight) {
 			if (time < flight.route.earliest) return;
 			var pos = flight.route.interpolate.until(time);
-			return {
-				number: flight.number,
-				start: flight.start,
-				end: flight.end,
+			var dest = (time < flight.route.latest)? r.underway : r.arrived;
+			dest.push({
+				object: flight,
 				route: pos
-			}
+			});
 		});
+		return r;
 	}
 
 	module.push = push;
