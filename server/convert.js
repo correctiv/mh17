@@ -10,8 +10,8 @@ var bounds = {
 
 function checkBounds (point) {
 	return (
-		point[1] >= bounds.w && point[1] <= bounds.e &&
-		point[2] >= bounds.s && point[2] <= bounds.n
+		point[0] >= bounds.w && point[0] <= bounds.e &&
+		point[1] >= bounds.s && point[1] <= bounds.n
 	);
 }
 
@@ -20,7 +20,7 @@ flights = flights.map(function (flight) {
 	var route = flight.route.coordinates.map(function (point, i) {
 		var profilePoint = flight.profile[i];
 		// { q: 'squawk', h: heading, s: groundSpeed, t: 'time', a: altitude }
-		return [profilePoint.t, point[0], point[1], profilePoint.a];
+		return [point[0], point[1], profilePoint.a, profilePoint.t];
 	}).filter(checkBounds);
 
 	if (route.length === 0) return;

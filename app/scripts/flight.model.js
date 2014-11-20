@@ -2,6 +2,7 @@
 	var module = {};
 	var eventListeners = {};
 	var undefined;
+	var dateKey = 3;
 
 	var earliest = Infinity, latest = 0;
 
@@ -20,12 +21,12 @@
 
 	function Route (points) {
 		points.forEach(function (point) {
-			point[0] = +(new Date(point[0]));
+			point[dateKey] = +(new Date(point[dateKey]));
 		});
-		this.earliest = points[0][0];
-		this.latest = points[points.length-1][0];
+		this.earliest = points[0][dateKey];
+		this.latest = points[points.length-1][dateKey];
 		this.points = points;
-		this.interpolate = new M.Interpol(points, 0);
+		this.interpolate = new M.Interpol(points, dateKey);
 	}
 
 	var flights = [];
@@ -76,8 +77,8 @@
 
 	module.push = push;
 	module.pushBulk = pushBulk;
-	module.at = { time: atTime };
-	module.until = { time: untilTime };
+	module.at = atTime;
+	module.until = untilTime;
 	module.raw = flights;
 	module.on = addEventListener;
 

@@ -1,26 +1,24 @@
-window.M.map = (function () {
-	var module = {};
-
+window.M.Map = function (container, options) {
 	var o = {};
 
-	var canvas, $canvas, ctx;
+	var parent = this;
+	var $container = $(container);
+	this.layers = {};
 
-	var baseImageData;
+	var bounds = {};
 
-	// For high-resolution displays where 1px != 1 device pixel
+	// Will be called at the very end of the class definition
+	function init () {
+		this.setDimensions({ width: options.width, height: options.height });
+		this.setBounds(options.bounds);
+	}
+
+	// Helper functions
 	function s (px) {
 		return px * window.devicePixelRatio;
 	}
 
-	function _pluralize (fn) {
-		return function pluralized (elements) {
-			elements.forEach(function (element) {
-				if (!element) return;
-				fn(element);
-			});
-		}
-	}
-
+	// GeoJSON functions
 	// https://gist.github.com/RandomEtc/668577
 	var project = {
 		'FeatureCollection': function(fc) { fc.features.forEach(project.Feature); },
@@ -66,106 +64,114 @@ window.M.map = (function () {
 	function yRel (l) { return Math.log(Math.tan(Math.PI/4+l[1]*(Math.PI/180)/2)) / Math.PI; }
 
 	function xAbs (xR) {
-		return o.width * (xR - o.bounds.left) / (o.bounds.right - o.bounds.left);
+		return o.width * (xR - bounds.w) / (bounds.e - bounds.w);
 	}
 	function yAbs (yR) {
-		return o.height * (yR - o.bounds.top) / (o.bounds.bottom - o.bounds.top);
+		return o.height * (yR - bounds.n) / (bounds.s - bounds.n);
 	}
 
 	function x (l) { return xAbs(xRel(l)); }
 	function y (l) { return yAbs(yRel(l)); }
 
-	function setWidth (w) {
-		o.width = w;
-		canvas.width = s(w);
-		$canvas.css('width', w);
-	}
-	function setHeight (h) {
-		o.height = h;
-		canvas.height = s(h);
-		$canvas.css('height', h);
-	}
-	function setBounds (bounds) {
-		if (!o.bounds) o.bounds = {};
-		var topLeft = [bounds.left, bounds.top];
-		var bottomRight = [bounds.right, bounds.bottom];
-		o.bounds.left =   xRel(topLeft);
-		o.bounds.right =  xRel(bottomRight);
-		o.bounds.top =    yRel(topLeft);
-		o.bounds.bottom = yRel(bottomRight);
-	}
 
-	function fillCircle (x, y, r) {
-		ctx.beginPath();
-		ctx.arc(s(x), s(y), s(r), 0, 2 * Math.PI);
-		ctx.fill();
-	}
+	function Layer (name) {
+		var $canvas = $('<canvas>');
+		var canvas = $canvas[0];
+		var ctx = canvas.getContext('2d');
+		$canvas.attr('id', 'map-layer-'+name);
+		$container.append($canvas);
 
-
-	function init (c, options) {
-		canvas = c;
-		$canvas = $(canvas);
-		ctx = canvas.getContext('2d');
-		setWidth(800);
-		setHeight(600);
-		setBounds(options.bounds);
-		ctx.fillStyle = '#ccc';
-	};
-
-	function drawGeoJSON (features) {
-		features.forEach(function (feature) {
-			project[feature.type](feature);
-			ctx.beginPath();
-			renderPath[feature.geometry.type].call(ctx, feature.geometry.coordinates);
-			ctx.fill();
-		});
-		checkpoint();
-	}
-
-	function drawFlightRoute (flight) {
-		if (!flight.route) return;
-		ctx.lineJoin = 'round';
-		ctx.lineWidth = 3;
-		if (flight.number === 'MH17') {
-			ctx.strokeStyle = '#f00';
-		} else {
-			ctx.strokeStyle = '#000';
-		}
-		ctx.beginPath();
-		var route = flight.route.map(function(pt) {
-			return [pt[1], pt[2]];
-		})
-		ctx.moveTo(s(x(route[0])), s(y(route[0])));
-		route.slice(1).forEach(function (point) {
-			ctx.lineTo(s(x(point)), s(y(point)));
-		});
-		ctx.stroke();
-	}
-
-	function drawFlight (flight) {
-		var pos = [flight.position[1], flight.position[2]];
-		fillCircle(x(pos), y(pos), 5);
-	}
-
-	function checkpoint () {
-		baseImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-	}
-
-	function clear () {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		if (baseImageData) ctx.putImageData(baseImageData, 0, 0);
 		ctx.fillStyle = '#000';
+		ctx.strokeStyle = '#000';
+
+		ctx.fillRect(0,0, 50, 50);
+
+		this._updateDimensions = function () {
+			_setHeight(o.height);
+			_setWidth(o.width);
+		}
+
+		_setWidth = function (w) {
+			if (w === undefined) return;
+			$canvas.attr('width', s(w));
+			$canvas.css('width', w + 'px');
+		}
+
+		_setHeight = function (h) {
+			if (h === undefined) return;
+			$canvas.attr('height', s(h));
+			$canvas.css('height', h + 'px');
+		}
+
+		this.drawGeoJSON = function (features) {
+			features.forEach(function (feature) {
+				project[feature.type](feature);
+				ctx.beginPath();
+				renderPath[feature.geometry.type].call(ctx, feature.geometry.coordinates);
+				ctx.fill();
+			});
+		}
+
+		this.drawLine = function (points) {
+			ctx.beginPath();
+			this.moveTo(points[0]);
+			points.slice(1).forEach(this.lineTo);
+			ctx.stroke();
+		}
+
+		this.moveTo = function (point) {
+			ctx.moveTo(s(x(point)), s(y(point)));
+		}
+
+		this.lineTo = function (point) {
+			ctx.lineTo(s(x(point)), s(y(point)));
+		}
+
+		this.drawCircle = function (point, r) {
+			console.log(s(x(point)), s(y(point)));
+			ctx.beginPath();
+			ctx.arc(s(x(point)), s(y(point)), s(r), 0, 2 * Math.PI);
+			ctx.fill();
+		}
+
+		this.drawMarker = function (point) {
+			this.drawCircle(point, 5);
+		}
+
+		this.clear = function () {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+		}
+
+		this.delete = function () {
+			$canvas.remove();
+			delete parent.layers[name];
+		}
+
+		this._updateDimensions();
 	}
 
-	module.init = init;
-	module.drawGeoJSON = drawGeoJSON;
-	module.clear = clear;
-	module.draw = {
-		geoJSON: drawGeoJSON,
-		flight: drawFlight,
-		flights: _pluralize(drawFlight),
-		flightRoute: drawFlightRoute,
-		flightRoutes: _pluralize(drawFlightRoute)
-	};
-	return module;
-})();
+	this.addLayer = function (name) {
+		var l = new Layer(name);
+		parent.layers[name] = l;
+		return l;
+	}
+
+	this.setDimensions = function (dimensions) {
+		for (var name in this.layers) {
+			this.layers[name]._setDimensions(dimensions);
+		}
+		$.extend(o, dimensions);
+		$container.css(dimensions);
+	}
+
+	this.setBounds = function (b) {
+		var nw = [b.w, b.n];
+		var se = [b.e, b.s];
+		bounds.w = xRel(nw);
+		bounds.n = yRel(nw);
+		bounds.e = xRel(se);
+		bounds.s = yRel(se);
+	}
+
+	init.call(this);
+}
