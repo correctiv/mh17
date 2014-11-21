@@ -15,9 +15,34 @@ function s (px) {
 	return px * window.devicePixelRatio;
 }
 
+map.addLayer('raster');
 map.addLayer('geography');
+map.addLayer('places');
 
+map.layers.raster.always(function() {
+	this.drawImage('images/map.jpg', {
+		se: [47.825696220889604, 39.21293632536268],
+		nw: [27.797508301428522, 53.546269658694584]
+	});
+});
 $.getJSON('data/ukraine.geojson', map.layers.geography.drawGeoJSON);
+$.get('data/places.tsv', function (data) {
+	var rows = data.trim().split("\n");
+	var headers = rows.shift().split("\t");
+	var places = rows.map(function(row) {
+		var r = {};
+		row.split("\t").forEach(function (v, i) {
+			var n = +v;
+			r[headers[i]] = isNaN(n)? v : n;
+		});
+		return r;
+	});
+	places.forEach(function (place) {
+		map.layers.places.always(function () {
+			this.drawCircle([place.x, place.y], 10-place.scalerank);
+		});
+	});
+});
 
 var arrivedAlpha = .04;
 var underwayAlpha = .6;

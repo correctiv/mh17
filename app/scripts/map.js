@@ -34,15 +34,15 @@ window.M.Map = function (container, options) {
 		}
 	}
 		
-	var renderPath = {
+	var renderGeoJSON = {
 		'MultiPolygon': function(mp) {
-			mp.forEach(renderPath.Polygon, this);
+			mp.forEach(renderGeoJSON.Polygon, this);
 		},
 		'Polygon': function(p) {
-			p.forEach(renderPath.LineString, this);
+			p.forEach(renderGeoJSON.LineString, this);
 		},
 		'MultiLineString': function(ml) {
-			ml.forEach(renderPath.LineString, this);
+			ml.forEach(renderGeoJSON.LineString, this);
 		},
 		'LineString': function(l) {
 			this.moveTo(s(l[0][0]), s(l[0][1]));
@@ -51,10 +51,10 @@ window.M.Map = function (container, options) {
 			}, this);
 		},
 		'MultiPoint': function(p) {
-			console.warn('MultiPoint geometry not implemented in renderPath');
+			console.warn('MultiPoint geometry not implemented in renderGeoJSON');
 		},
 		'Point': function(p) {
-			console.warn('Point geometry not implemented in renderPath');
+			this.fillRect(s(p[0]-5), s(p[1]-5), s(10), s(10));
 		}
 	};
 
@@ -99,6 +99,7 @@ window.M.Map = function (container, options) {
 		this._updateDimensions = function () {
 			setHeight(o.height);
 			setStyle(o.width);
+			trigger('redraw', ctx);
 		}
 
 		function setStyle (w) {
@@ -132,17 +133,39 @@ window.M.Map = function (container, options) {
 			}
 		})();
 
-		this.drawGeoJSON = function (features) {
-			features.forEach(function (feature) {
-				project[feature.type](feature);
+		var eventHandlers = {};
+		this.on = function (event, handler) {
+			if (!eventHandlers[event]) eventHandlers[event] = [];
+			eventHandlers[event].push(handler);
+		}
 
+		this.always = function (handler) {
+			this.on('redraw', handler);
+			handler.call(me);
+		}
+
+		function trigger (event, data) {
+			if (!eventHandlers[event]) return false;
+			eventHandlers[event].forEach(function (h) {
+				h.call(me, data);
+			});
+		}
+
+		this.drawGeoJSON = function (FeatureCollection) {
+			project[FeatureCollection.type](FeatureCollection);
+
+			FeatureCollection.features.sort(function (a, b) {
+				return (a.properties.layer||0) - (b.properties.layer||0);
+			});
+
+			FeatureCollection.features.forEach(function (feature) {
 				styles.set(feature.properties.style);
 				ctx.beginPath();
-				renderPath[feature.geometry.type].call(ctx, feature.geometry.coordinates);
+				renderGeoJSON[feature.geometry.type].call(ctx, feature.geometry.coordinates);
 				feature.properties.draw.forEach(function (action) {
 					ctx[action]();
 				});
-				styles.restore();
+				styles.restore();				
 			});
 		}
 
@@ -173,8 +196,23 @@ window.M.Map = function (container, options) {
 					ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
 				});
 			} else {
-
 			}
+		}
+
+		this.drawImage = function (image, bounds) {
+			image = $('<img src="'+image+'">')[0];
+				window.setTimeout(function () {
+				bounds = {
+					n: lY(bounds.nw),
+					w: lX(bounds.nw),
+					s: lY(bounds.se),
+					e: lX(bounds.se)
+				}
+				var width = s(bounds.e-bounds.w);
+				var height = s(bounds.s-bounds.n);
+				console.log(width, height, bounds);
+				ctx.drawImage(image, s(bounds.w), s(bounds.n), s(bounds.e-bounds.w), s(bounds.s-bounds.n));
+			}, 1000);
 		}
 
 		this.rotateTranslateDo = function (point, angle, callback) {
@@ -206,19 +244,6 @@ window.M.Map = function (container, options) {
 				ctx.fillStyle = 'rgb(' + col.join() + ')';
 				this.drawCircle(point, r);
 				hotspotIndex[col.join()] = data;
-			}
-
-			var eventHandlers = {};
-			this.on = function (event, handler) {
-				if (!eventHandlers[event]) eventHandlers[event] = [];
-				eventHandlers[event].push(handler);
-			}
-
-			function trigger (event, data) {
-				if (!eventHandlers[event]) return false;
-				eventHandlers[event].forEach(function (h) {
-					h(data);
-				});
 			}
 
 			$canvas.css('opacity', 0);
