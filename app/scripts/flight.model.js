@@ -2,7 +2,7 @@
 	var module = {};
 	var eventListeners = {};
 	var undefined;
-	var dateKey = 3;
+	var dateKey = 2;
 
 	var earliest = Infinity, latest = 0;
 
@@ -51,26 +51,25 @@
 		trigger('bulkpushed', { earliest: earliest, latest: latest, time: earliest });
 	}
 
-	function atTime (time) {
-		return flights.map(function (flight) {
-			if (time < flight.route.earliest || time > flight.route.latest) return;
-			var pos = flight.route.interpolate.by(time);
-			return {
-				object: flight,
-				position: pos
-			}
-		});
+	function calculateHeading (route) {
+		var end   = route[route.length-1];
+		var start = route[route.length-2] || end;
+		var dx = end[0] - start[0];
+		var dy = end[1] - start[1];
+		return -Math.atan2(dy, dx);
 	}
 
 	function untilTime (time) {
 		var r = { underway: [], arrived: [] };
 		flights.forEach(function (flight) {
 			if (time < flight.route.earliest) return;
-			var pos = flight.route.interpolate.until(time);
+			var route = flight.route.interpolate.until(time);
+			var heading = calculateHeading(route);
 			var dest = (time < flight.route.latest)? r.underway : r.arrived;
 			dest.push({
 				object: flight,
-				route: pos
+				heading: heading,
+				route: route
 			});
 		});
 		return r;
@@ -78,7 +77,6 @@
 
 	module.push = push;
 	module.pushBulk = pushBulk;
-	module.at = atTime;
 	module.until = untilTime;
 	module.raw = flights;
 	module.on = addEventListener;

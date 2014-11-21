@@ -81,6 +81,7 @@ window.M.Map = function (container, options) {
 		$canvas.attr('id', 'map-layer-'+name);
 		$container.append($canvas);
 		options = options || {};
+		var me = this;
 
 		var lX = x;
 		var lY = y;
@@ -161,23 +162,70 @@ window.M.Map = function (container, options) {
 		}
 
 		this.drawCircle = function (point, r) {
-			console.log(s(lX(point)), s(lY(point)));
 			ctx.beginPath();
 			ctx.arc(s(lX(point)), s(lY(point)), s(r), 0, 2 * Math.PI);
 			ctx.fill();
 		}
 
-		this.drawMarker = function (point) {
-			this.drawCircle(point, 5);
+		this.drawMarker = function (image, point, rotation) {
+			if (rotation) {
+				ctx.save();
+				ctx.translate(s(lX(point)), s(lY(point)));
+				ctx.rotate(rotation);
+				ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
+				ctx.restore();
+			} else {
+				this.drawCircle(point, 5);
+			}
 		}
 
 		this.clear = function () {
+			hotspotIndex = {};
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 		}
 
 		this.delete = function () {
 			$canvas.remove();
 			delete parent.layers[name];
+		}
+
+		var hotspotIndex = {};
+		if (options.interactive) {
+			this.drawHotspot = function (point, r, data) {
+				var col = [
+					(Math.random()*256)|0,
+					(Math.random()*256)|0,
+					(Math.random()*256)|0
+				];
+				ctx.fillStyle = 'rgb(' + col.join() + ')';
+				this.drawCircle(point, r);
+				hotspotIndex[col.join()] = data;
+			}
+
+			var eventHandlers = {};
+			this.on = function (event, handler) {
+				if (!eventHandlers[event]) eventHandlers[event] = [];
+				eventHandlers[event].push(handler);
+			}
+
+			function trigger (event, data) {
+				if (!eventHandlers[event]) return false;
+				eventHandlers[event].forEach(function (h) {
+					h(data);
+				});
+			}
+
+			$canvas.css('opacity', 0);
+
+			$canvas.on('mousemove', function (ev) {
+				var x = ev.offsetX, y = ev.offsetY;
+				col = ctx.getImageData(s(x), s(y), 1, 1).data;
+				col = [col[0], col[1], col[2]].join();
+
+				if (hotspotIndex[col]) {
+					trigger('hotspot', hotspotIndex[col]);
+				}
+			});
 		}
 
 		this.ctx = ctx;

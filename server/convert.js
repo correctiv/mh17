@@ -5,8 +5,10 @@ var result = JSON.parse(fs.readFileSync('data/raw.json'));
 var flights = result.hits.hits.map(function (r) { return r._source });
 
 var bounds = {
-	n: 57, s: 43, w: 23, e: 47
+	n: 52, s: 45, w: 34, e: 42
 }
+
+var includeAltitude = false;
 
 function checkBounds (point) {
 	return (
@@ -23,16 +25,20 @@ flights = flights.map(function (flight) {
 	var route = flight.route.coordinates.map(function (point, i) {
 		var profilePoint = flight.profile[i];
 		// { q: 'squawk', h: heading, s: groundSpeed, t: 'time', a: altitude }
-		return [point[0], point[1], profilePoint.a, profilePoint.t];
+		var altitude = profilePoint.a * includeAltitude;
+		return [point[0], point[1], altitude, profilePoint.t];
 	}).filter(checkBounds);
 
 	if (route.length === 0) return;
 
-	route = simplify(route, .02, true);
-	route.forEach(function project (point) {
-		var x = xRel(point), y = yRel(point);
-		point[0] = x;
-		point[1] = y;
+	route = simplify(route, .01, true);
+	route.forEach(function project (pt) {
+		var x = xRel(pt), y = yRel(pt);
+		pt[0] = x;
+		pt[1] = y;
+	});
+	if (!includeAltitude) route = route.map(function (pt) {
+		return [pt[0], pt[1], pt[3]];
 	});
 
 	f.push(flight.flight);
