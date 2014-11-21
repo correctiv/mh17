@@ -175,7 +175,7 @@ window.M.Map = function (container, options) {
 				ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
 				ctx.restore();
 			} else {
-				this.drawCircle(point, 5);
+
 			}
 		}
 

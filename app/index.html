@@ -20,6 +20,13 @@
 
 		<div id="map-container"></div>
 
+		<a href="#slower" onclick="M.clock.start(); return false;">Start</a> |
+		<a href="#slower" onclick="M.clock.pause(); return false;">Pause</a> |
+		<a href="#spd50" onclick="M.clock.speed(50); return false;">50-fach</a> |
+		<a href="#spd100" onclick="M.clock.speed(100); return false;">100-fach</a> |
+		<a href="#spd500" onclick="M.clock.speed(500); return false;">500-fach</a> |
+		<a href="#reset" onclick="M.clock.time(0); return false;">zurücksetzen</a>
+
 
 		<!-- build:js scripts/vendor.js -->
 		<!-- bower:js -->

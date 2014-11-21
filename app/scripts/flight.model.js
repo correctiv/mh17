@@ -48,7 +48,7 @@
 
 	function pushBulk (flights) {
 		flights.forEach(push);
-		trigger('bulkpushed', { earliest: earliest, latest: latest, time: earliest });
+		trigger('bulkpushed', { earliest: earliest, latest: latest, time: earliest, speed: 50 });
 	}
 
 	function calculateHeading (route) {
