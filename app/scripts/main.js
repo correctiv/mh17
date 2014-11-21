@@ -8,6 +8,13 @@ var map = new M.Map($('#map-container'), {
 	width: 600,
 	height: 600
 });
+
+var HALFPI = Math.PI/2;
+
+function s (px) {
+	return px * window.devicePixelRatio;
+}
+
 map.addLayer('geography');
 
 $.getJSON('data/ukraine.geojson', map.layers.geography.drawGeoJSON);
@@ -20,27 +27,54 @@ var arrived = map.addLayer('arrived', opts);
 var underway = map.addLayer('underway', opts);
 var hotspots = map.addLayer('hotspots', { interactive: true, projected: true });
 underway.ctx.lineWidth = 3;
+underway.ctx.textAlign = 'right';
+underway.ctx.textBaseline = 'bottom';
 arrived.ctx.lineWidth = 3;
 arrived.ctx.globalAlpha = arrivedAlpha;
 
 $.getJSON('data/flights.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);
 
-hotspots.on('hotspot', function (flight) {
+hotspots.on('mouseenter', function (flight) {
 	hoverFlight = flight;
-	console.log(flight);
+});
+hotspots.on('mouseleave', function () {
+	hoverFlight = null;
 });
 
 var hoverFlight;
 var previouslyArrived = [];
 
 function drawFlightLabel (flight) {
-	underway.drawMarker(flight.route[flight.route.length-1]);
+	var angle = flight.heading;
+	var textAlign = 'right';
+	var xAnchor = -5;
+	if (angle > HALFPI) {
+		angle -= Math.PI;
+		textAlign = 'left';
+		xAnchor *= -1;
+	} else if (angle < -HALFPI) {
+		angle += Math.PI;
+		textAlign = 'left';
+		xAnchor *= -1;
+	}
+
+	underway.rotateTranslateDo(flight.position, angle, function () {
+		this.textAlign = textAlign;
+		this.fillText(flight.object.number, s(xAnchor), s(-15));
+		this.fillText(flight.object.start+'—'+flight.object.end, s(xAnchor), s(-5));
+	});
 }
 
 var planeMarker = $('<img src="images/plane.png">')[0];
 function drawPlaneMarker (flight) {
-	underway.drawMarker(planeMarker, flight.route[flight.route.length-1], flight.heading);
+	underway.drawMarker(planeMarker, flight.position, flight.heading);
+}
+function drawMH17Marker (flight) {
+	underway.ctx.save();
+	underway.ctx.fillColor = 'rgba(255,0,0,.5)';
+	underway.drawCircle(flight.position, 20);
+	underway.ctx.restore();
 }
 
 M.clock.on('tick', function (time) {
@@ -51,11 +85,14 @@ M.clock.on('tick', function (time) {
 		if (flight.object === hoverFlight) {
 			drawFlightLabel(flight);
 		}
+		if (flight.object.number === 'MH17') {
+			drawMH17Marker(flight);
+		}
 		drawPlaneMarker(flight);
 		var untilArrival = Math.min(1, (flight.object.route.latest - time)/300000);
 		underway.ctx.globalAlpha = arrivedAlpha + untilArrival * (underwayAlpha - arrivedAlpha);
 		underway.drawLine(flight.route);
-		hotspots.drawHotspot(flight.route[flight.route.length-1], 15, flight.object);
+		hotspots.drawHotspot(flight.position, 15, flight.object);
 	}
 	function drawArrived (flight) {
 		arrived.drawLine(flight.route);

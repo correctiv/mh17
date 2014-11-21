@@ -167,16 +167,22 @@ window.M.Map = function (container, options) {
 			ctx.fill();
 		}
 
-		this.drawMarker = function (image, point, rotation) {
-			if (rotation) {
-				ctx.save();
-				ctx.translate(s(lX(point)), s(lY(point)));
-				ctx.rotate(rotation);
-				ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
-				ctx.restore();
+		this.drawMarker = function (image, point, angle) {
+			if (angle) {
+				this.rotateTranslateDo(point, angle, function (ctx) {
+					ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
+				});
 			} else {
 
 			}
+		}
+
+		this.rotateTranslateDo = function (point, angle, callback) {
+			ctx.save();
+			ctx.translate(s(lX(point)), s(lY(point)));
+			ctx.rotate(angle);
+			callback.call(ctx, ctx);
+			ctx.restore();
 		}
 
 		this.clear = function () {
@@ -217,13 +223,23 @@ window.M.Map = function (container, options) {
 
 			$canvas.css('opacity', 0);
 
-			$canvas.on('mousemove', function (ev) {
+			var currentHoverTarget = null;
+
+			$canvas.on('mousemove mouseenter mouseleave', function (ev) {
 				var x = ev.offsetX, y = ev.offsetY;
 				col = ctx.getImageData(s(x), s(y), 1, 1).data;
 				col = [col[0], col[1], col[2]].join();
 
 				if (hotspotIndex[col]) {
-					trigger('hotspot', hotspotIndex[col]);
+					var data = hotspotIndex[col];
+					$canvas.css('cursor', 'pointer');
+					trigger('mousemove', data);
+					if (currentHoverTarget !== data) trigger('mouseenter', data);
+					currentHoverTarget = data;
+				} else {
+					if (currentHoverTarget) trigger('mouseleave', currentHoverTarget);
+					$canvas.css('cursor', 'default');
+					currentHoverTarget = null;
 				}
 			});
 		}

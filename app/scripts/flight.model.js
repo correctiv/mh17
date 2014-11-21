@@ -69,6 +69,7 @@
 			dest.push({
 				object: flight,
 				heading: heading,
+				position: route[route.length-1],
 				route: route
 			});
 		});
