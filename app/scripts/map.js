@@ -5,12 +5,13 @@ window.M.Map = function (container, options) {
 	var $container = $(container);
 	this.layers = {};
 
+	var desiredBounds = {};
 	var bounds = {};
 
 	// Will be called at the very end of the class definition
 	function init () {
-		this.setDimensions({ width: options.width, height: options.height });
 		this.setBounds(options.bounds);
+		this.setDimensions(options.width, options.height);
 	}
 
 	// Helper functions
@@ -45,16 +46,16 @@ window.M.Map = function (container, options) {
 			ml.forEach(renderGeoJSON.LineString, this);
 		},
 		'LineString': function(l) {
-			this.moveTo(s(l[0][0]), s(l[0][1]));
+			this.moveTo(s(x(l[0])), s(y(l[0])));
 			l.slice(1).forEach(function(c){
-				this.lineTo(s(c[0]), s(c[1]));
+				this.lineTo(s(x(c)), s(y(c)));
 			}, this);
 		},
 		'MultiPoint': function(p) {
 			console.warn('MultiPoint geometry not implemented in renderGeoJSON');
 		},
 		'Point': function(p) {
-			this.fillRect(s(p[0]-5), s(p[1]-5), s(10), s(10));
+			this.fillRect(s(x(p)-5), s(y(p)-5), s(10), s(10));
 		}
 	};
 
@@ -86,6 +87,8 @@ window.M.Map = function (container, options) {
 		var lX = x;
 		var lY = y;
 
+		var baseStyles;
+
 		if (options.projected) {
 			lX = function (pt) { return xAbs(pt[0]); };
 			lY = function (pt) { return yAbs(pt[1]); };
@@ -99,7 +102,7 @@ window.M.Map = function (container, options) {
 		this._updateDimensions = function () {
 			setHeight(o.height);
 			setStyle(o.width);
-			trigger('redraw', ctx);
+			redraw();
 		}
 
 		function setStyle (w) {
@@ -112,6 +115,18 @@ window.M.Map = function (container, options) {
 			if (h === undefined) return;
 			$canvas.attr('height', s(h));
 			$canvas.css('height', h + 'px');
+		}
+
+		function applyBaseStyles () {
+			if (!baseStyles) return;
+			baseStyles.forEach(function (style) {
+				ctx[style.property] = style.value;
+			});
+		}
+
+		function redraw () {
+			applyBaseStyles();
+			trigger('redraw', me);
 		}
 
 		var styles = (function () {
@@ -141,7 +156,7 @@ window.M.Map = function (container, options) {
 
 		this.always = function (handler) {
 			this.on('redraw', handler);
-			handler.call(me);
+			handler.call(me, me);
 		}
 
 		function trigger (event, data) {
@@ -151,22 +166,29 @@ window.M.Map = function (container, options) {
 			});
 		}
 
-		this.drawGeoJSON = function (FeatureCollection) {
-			project[FeatureCollection.type](FeatureCollection);
+		this.setBaseStyles = function (s) {
+			baseStyles = [];
+			for (var property in s) {
+				baseStyles.push({ property: property, value: s[property] });
+			}
+			applyBaseStyles();
+		}
 
+		this.drawGeoJSON = function (FeatureCollection, callback) {
 			FeatureCollection.features.sort(function (a, b) {
 				return (a.properties.layer||0) - (b.properties.layer||0);
 			});
 
 			FeatureCollection.features.forEach(function (feature) {
-				styles.set(feature.properties.style);
 				ctx.beginPath();
 				renderGeoJSON[feature.geometry.type].call(ctx, feature.geometry.coordinates);
-				feature.properties.draw.forEach(function (action) {
-					ctx[action]();
-				});
-				styles.restore();				
+				callback.call(ctx, ctx);
 			});
+		}
+
+		this.prepareGeoJSONPath = function (feature) {
+			ctx.beginPath();
+			renderGeoJSON[feature.geometry.type].call(ctx, feature.geometry.coordinates);
 		}
 
 		this.drawLine = function (points) {
@@ -190,9 +212,13 @@ window.M.Map = function (container, options) {
 			ctx.fill();
 		}
 
+		this.drawSquarePoint = function (center, side) {
+			ctx.fillRect(s(lX(center)-side/2), s(lY(center)-side/2), side, side);
+		}
+
 		this.drawMarker = function (image, point, angle) {
 			if (angle) {
-				this.rotateTranslateDo(point, angle, function (ctx) {
+				this.rotateTranslateDo(point, angle, function () {
 					ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
 				});
 			} else {
@@ -200,26 +226,32 @@ window.M.Map = function (container, options) {
 		}
 
 		this.drawImage = function (image, bounds) {
-			image = $('<img src="'+image+'">')[0];
-				window.setTimeout(function () {
-				bounds = {
-					n: lY(bounds.nw),
-					w: lX(bounds.nw),
-					s: lY(bounds.se),
-					e: lX(bounds.se)
-				}
-				var width = s(bounds.e-bounds.w);
-				var height = s(bounds.s-bounds.n);
-				console.log(width, height, bounds);
-				ctx.drawImage(image, s(bounds.w), s(bounds.n), s(bounds.e-bounds.w), s(bounds.s-bounds.n));
-			}, 1000);
+			bounds = {
+				n: lY(bounds.nw),
+				w: lX(bounds.nw),
+				s: lY(bounds.se),
+				e: lX(bounds.se)
+			}
+			var width = s(bounds.e-bounds.w);
+			var height = s(bounds.s-bounds.n);
+			console.log(width, height, bounds);
+			ctx.drawImage(image, s(bounds.w), s(bounds.n), s(bounds.e-bounds.w), s(bounds.s-bounds.n));
+		}
+
+		this.fillText = function (text, point, pixelOffsetX, pixelOffsetY) {
+			ctx.fillText(text, s(lX(point) + pixelOffsetX), s(lY(point) + pixelOffsetY));
+		}
+
+		this.strokeFillText = function (text, point, pixelOffsetX, pixelOffsetY) {
+			ctx.strokeText(text, s(lX(point) + pixelOffsetX), s(lY(point) + pixelOffsetY));
+			ctx.fillText(text, s(lX(point) + pixelOffsetX), s(lY(point) + pixelOffsetY));
 		}
 
 		this.rotateTranslateDo = function (point, angle, callback) {
 			ctx.save();
 			ctx.translate(s(lX(point)), s(lY(point)));
 			ctx.rotate(angle);
-			callback.call(ctx, ctx);
+			callback.call(this, this);
 			ctx.restore();
 		}
 
@@ -279,21 +311,68 @@ window.M.Map = function (container, options) {
 		return l;
 	}
 
-	this.setDimensions = function (dimensions) {
-		for (var name in this.layers) {
-			this.layers[name]._setDimensions(dimensions);
+	this.setDimensions = function (width, height) {
+		// We need to make sure that the desired bounds fit entirely
+		// within the viewport defined by the width and the height.
+		// To do so, we need to make sure that both have the same aspect ratio
+		// (this only works because we're using Web Mercator and because our
+		// bounds are pre-projected).
+		// This was fun to figure out.
+		var n = desiredBounds.n;
+		var s = desiredBounds.s;
+		var e = desiredBounds.e;
+		var w = desiredBounds.w;
+
+		var boundsWidth = e-w;
+		var boundsHeight = n-s;
+
+		var vCenter = s + boundsHeight/2;
+		var hCenter = w + boundsWidth/2;
+
+		var boundsRatio = boundsWidth/boundsHeight;
+		var viewportRatio = width/height;
+
+		console.log(boundsRatio/viewportRatio);
+
+		if (viewportRatio > boundsRatio) {
+			// viewport is too wide for bounds
+			// we need to widen the bounds
+			var scale = viewportRatio / boundsRatio;
+			w = hCenter - scale * boundsWidth / 2;
+			e = hCenter + scale * boundsWidth / 2;
+		} else if (viewportRatio < boundsRatio) {
+			// viewport is too tall for the bounds
+			// we need to make the bounds taller
+			var scale = boundsRatio / viewportRatio;
+			s = vCenter - scale * boundsHeight / 2;
+			n = vCenter + scale * boundsHeight / 2;
 		}
-		$.extend(o, dimensions);
-		$container.css(dimensions);
+
+		bounds = {
+			n: n,
+			s: s,
+			e: e,
+			w: w
+		}
+
+		for (var name in this.layers) {
+			this.layers[name]._updateDimensions();
+		}
+		var obj = {width: width, height: height};
+		$.extend(o, obj);
+		$container.css(obj);
 	}
 
 	this.setBounds = function (b) {
 		var nw = [b.w, b.n];
 		var se = [b.e, b.s];
-		bounds.w = xRel(nw);
-		bounds.n = yRel(nw);
-		bounds.e = xRel(se);
-		bounds.s = yRel(se);
+
+		desiredBounds = {
+			w: xRel(nw),
+			n: yRel(nw),
+			e: xRel(se),
+			s: yRel(se)
+		}
 	}
 
 	init.call(this);

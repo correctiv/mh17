@@ -32,5 +32,8 @@
     "serve-static": "^1.4.0",
     "simplify-js": "git://github.com/mourner/simplify-js.git#3d",
     "wiredep": "^2.0.0"
+  },
+  "dependencies": {
+    "csv": "^0.4.1"
   }
 }
