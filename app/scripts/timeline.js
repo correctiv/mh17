@@ -271,8 +271,6 @@ $(function () {
 
 	var keyDown = {
 		32: function spaceKey (ev) { ev.preventDefault(); $('#button-play-pause').addClass('active'); },
-		38: function upKey (ev) { ev.preventDefault(); sliderIncrement($('.slider-simulation-speed'), ev.metaKey? 1000 : 10); },
-		40: function downKey (ev) { ev.preventDefault(); sliderIncrement($('.slider-simulation-speed'), ev.metaKey? -1000 : -10); },
 		37: function leftKey (ev) { ev.preventDefault; M.clock.set(M.clock.time() - (ev.shiftKey? 36e5 : 6e4)) },
 		39: function rightKey (ev) { ev.preventDefault; M.clock.set(M.clock.time() + (ev.shiftKey? 36e5 : 6e4)) }
 	}
@@ -303,9 +301,4 @@ $(function () {
 	});
 	M.timeHUD.init('.timeline-time-hud');
 
-	function sliderIncrement (slider, amount) {
-		var $s = $(slider);
-		$s.val(+$s.val() + amount);
-		$s.triggerHandler('change');
-	}
 });

@@ -7,6 +7,11 @@ $timeline-height: 50px;
 	height: $timeline-height;
 	background: rgba(#fff, .8);
 }
+.timeline-buttons {
+	z-index: 2;
+	position: absolute;
+	left: 0;
+}
 .button {
 	display: inline-block;
 	border: none;
@@ -16,15 +21,21 @@ $timeline-height: 50px;
 	padding: .5em;
 	box-sizing: border-box;
 }
+.button svg * {
+	fill: #fff;
+}
 .button-play-pause {
 	float: left;
 	width: $timeline-height;
 	height: $timeline-height;
 	.default { display: none; }
-	&.playing:after { content: '▐▐  '; }
-	&.paused:after { content: '▶'; }	
+	&.playing .play, &.paused .pause { display: none; }
+	.play-backwards { display: none; }
 }
-.backwards .button-play-pause.paused:after { content: '◀︎'; }
+.backwards .button-play-pause {
+	.play-forwards { display: none; }
+	.play-backwards { display: inline-block; }
+}
 .timeline-time-hud {
 	position: absolute;
 	text-align: right;
@@ -34,6 +45,7 @@ $timeline-height: 50px;
 	padding-right: .2em;
 }
 .timeline-chart {
+	z-index: 1;
 	position: absolute;
 	left: $timeline-height;
 	overflow: hidden;
