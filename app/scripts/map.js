@@ -234,7 +234,6 @@ window.M.Map = function (container, options) {
 			}
 			var width = s(bounds.e-bounds.w);
 			var height = s(bounds.s-bounds.n);
-			console.log(width, height, bounds);
 			ctx.drawImage(image, s(bounds.w), s(bounds.n), s(bounds.e-bounds.w), s(bounds.s-bounds.n));
 		}
 
@@ -331,8 +330,6 @@ window.M.Map = function (container, options) {
 
 		var boundsRatio = boundsWidth/boundsHeight;
 		var viewportRatio = width/height;
-
-		console.log(boundsRatio/viewportRatio);
 
 		if (viewportRatio > boundsRatio) {
 			// viewport is too wide for bounds

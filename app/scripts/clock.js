@@ -18,7 +18,8 @@ var o = {
 	time: new Date(),
 	speed: 1,
 	earliest: 0,
-	latest: Infinity
+	latest: Infinity,
+	caffeinated: false
 };
 
 var errors = {
@@ -69,7 +70,7 @@ function _bounded (t) {
 }
 function _heartbeatInterval () {
 	var simTimeAtCurrentTick = _simTime();
-	if (simTimeAtCurrentTick !== simTimeAtLastTick) _trigger('tick');
+	if (simTimeAtCurrentTick !== simTimeAtLastTick || o.caffeinated) _trigger('tick');
 	simTimeAtLastTick = simTimeAtCurrentTick;
 	window.requestAnimationFrame(_heartbeatInterval);
 }
@@ -178,6 +179,23 @@ function get () {
 }
 
 /**
+ * Make the clock keep firing "tick" events even when the simulated time
+ * no longer changes.
+ * @memberof Clock
+ */
+function caffeinate () {
+	o.caffeinated = true;
+}
+
+/**
+ * Make the clock only fire "tick" events when the time has changed.
+ * @memberof Clock
+ */
+function decaffeinate () {
+	o.caffeinated = false;
+}
+
+/**
  * Returns the current simulated time as a JavaScript Date instance.
  * @returns {Date}
  * @memberof Clock
@@ -236,6 +254,8 @@ return {
 	time: time,
 	get: get,
 	date: date,
+	caffeinate: caffeinate,
+	decaffeinate: decaffeinate,
 	speed: speed,
 	earliest: earliest,
 	latest: latest,

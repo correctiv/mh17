@@ -171,7 +171,7 @@ function drawFlightLabel (flight) {
 	});
 }
 
-var planeMarker = $('<img src="images/plane.png">')[0];
+var planeMarker = $('<img src="images/plane.svg">')[0];
 function drawPlaneMarker (flight) {
 	underway.drawMarker(planeMarker, flight.position, flight.heading);
 }
