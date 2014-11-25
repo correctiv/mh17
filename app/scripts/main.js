@@ -20,6 +20,7 @@ var fontFamily = 'sans-serif';
 map.addLayer('raster');
 map.addLayer('geography');
 map.addLayer('places');
+map.addLayer('nofly');
 
 map.layers.places.setBaseStyles({
 	globalAlpha: .8,
@@ -32,8 +33,8 @@ map.layers.places.setBaseStyles({
 
 var mapImage = document.createElement('img');
 var mapImageBounds = {
-	se: [47.825696220889604, 39.21293632536268],
-	nw: [27.797508301428522, 53.546269658694584]
+	se: [49, 43],
+	nw: [27, 53]
 };
 mapImage.setAttribute('src', 'images/map.jpg');
 $.getJSON('data/ukraine.geojson', function (FeatureCollection) {
@@ -53,6 +54,14 @@ $.getJSON('data/ukraine.geojson', function (FeatureCollection) {
 		});
 	});
 });
+$.getJSON('data/no-fly.geojson', function (FeatureCollection) {
+	map.layers.nofly.always(function (layer) {
+		layer.ctx.save();
+		layer.ctx.fillStyle = 'rgba(0,0,0,.2)';
+		layer.drawGeoJSON(FeatureCollection, function () { this.fill(); });
+		layer.ctx.restore();
+	});
+})
 $.getJSON('data/urban-areas.geojson', function (FeatureCollection) {
 	map.layers.places.always(function (layer) {
 		layer.ctx.save();
@@ -123,6 +132,7 @@ hotspots.on('mouseleave', function () {
 
 var hoverFlight;
 var previouslyArrived = [];
+arrived.on('redraw', function () { previouslyArrived = []; })
 
 function drawFlightLabel (flight) {
 	var angle = flight.heading;

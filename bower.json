@@ -2,6 +2,8 @@
   "name": "mh17",
   "private": true,
   "dependencies": {
-    "jquery": "~2.1.1"
+    "jquery": "~2.1.1",
+    "moment": "~2.8.4",
+    "moment-timezone": "~0.2.5"
   }
 }

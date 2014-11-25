@@ -4,6 +4,14 @@
 		<meta charset="utf-8">
 		<meta name="description" content="">
 		<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:site" content="@nytimes">
+		<meta name="twitter:creator" content="@bockph">
+		<meta name="twitter:title" content="">
+		<meta name="twitter:description" content="">
+		<meta name="twitter:image:src" content="http://">
+
 		<title>mh17</title>
 
 		<!-- build:css styles/vendor.css -->
@@ -20,26 +28,36 @@
 
 		<div id="map-container"></div>
 
-		<a href="#slower" onclick="M.clock.start(); return false;">Start</a> |
-		<a href="#slower" onclick="M.clock.pause(); return false;">Pause</a> |
-		<a href="#spd50" onclick="M.clock.speed(50); return false;">50-fach</a> |
-		<a href="#spd100" onclick="M.clock.speed(100); return false;">100-fach</a> |
-		<a href="#spd500" onclick="M.clock.speed(500); return false;">500-fach</a> |
-		<a href="#reset" onclick="M.clock.time(0); return false;">zurücksetzen</a>
+		<section class="timeline">
+			<nav>
+				<button class="button button-play-pause playing" id="button-play-pause"><span class="default">Start/Pause</span></button>
+				<div class="timeline-chart timeline-chart-day">
+					<canvas id="timeline-graph" height="80px"></canvas>
+				</div>
+				<input type="range" class="slider slider-simulation-speed" min="-95" max="95"  value="35">
+				<div class="timeline-time-hud">
+					<p><span class="js-day"></span>. <span class="js-month"></span> 
+					<span class="js-hour"></span>:<span class="js-minute"></span></p>
+				</div>
+			</nav>
+		</section>
 
 
 		<!-- build:js scripts/vendor.js -->
 		<!-- bower:js -->
 		<script src="../bower_components/jquery/dist/jquery.js"></script>
+		<script src="../bower_components/moment/moment.js"></script>
+		<script src="../bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.js"></script>
 		<!-- endbower -->
 		<!-- endbuild -->
 
-		<script>window.M = {};</script>
+		<script>window.M = { settings: { timezone: 'Europe/Kiev' } };</script>
 		<!-- build:js scripts/main.js -->
 		<script src="scripts/helpers.js"></script>
 		<script src="scripts/interpol.js"></script>
 		<script src="scripts/flight.model.js"></script>
 		<script src="scripts/clock.js"></script>
+		<script src="scripts/timeline.js"></script>
 		<script src="scripts/map.js"></script>
 		<script src="scripts/main.js"></script>
 		<!-- endbuild -->

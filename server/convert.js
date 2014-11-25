@@ -38,7 +38,6 @@ fs.createReadStream('data/openflights/airlines.csv')
 	while (row = this.read()) {
 		if (row[7] === 'N') continue; // Airline is defunct
 		var IATA = row[3];
-		// 
 		if (airlines[IATA]) continue;
 		airlines[IATA] = row[1];
 	}
