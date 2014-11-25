@@ -4,6 +4,7 @@
   "dependencies": {
     "jquery": "~2.1.1",
     "moment": "~2.8.4",
-    "moment-timezone": "~0.2.5"
+    "moment-timezone": "~0.2.5",
+    "modestmaps-js": "https://github.com/modestmaps/modestmaps-js.git#~3.3.6"
   }
 }
