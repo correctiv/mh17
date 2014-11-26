@@ -44,24 +44,26 @@
 						</svg>
 					</button>
 
-					<svg class="fast-forward" version="1.1" x="0px" y="0px" width="20px" height="10px" viewBox="0 0 20 10" enable-background="new 0 0 20 10">
-						<polygon points="0,0 10,5 0,10 "/>
-						<polygon points="10,0 20,5 10,10 "/>
-					</svg>
-					<input type="range" class="slider slider-simulation-speed" min="10" max="50" value="15">
-					<svg class="double-fast-forward" version="1.1" x="0px" y="0px" width="30px" height="10px" viewBox="0 0 30 10" enable-background="new 0 0 30 10">
-						<polygon points="0,0 10,5 0,10 "/>
-						<polygon points="10,0 20,5 10,10 "/>
-						<polygon points="20,0 30,5 20,10 "/>
-					</svg>
+					<div class="timeline-control timeline-speed">
+						<svg class="fast-forward" version="1.1" x="0px" y="0px" width="20px" height="10px" viewBox="0 0 20 10" enable-background="new 0 0 20 10">
+							<polygon points="0,0 10,5 0,10 "/>
+							<polygon points="10,0 20,5 10,10 "/>
+						</svg>
+						<input type="range" class="slider slider-simulation-speed" min="10" max="50" value="15">
+						<svg class="double-fast-forward" version="1.1" x="0px" y="0px" width="30px" height="10px" viewBox="0 0 30 10" enable-background="new 0 0 30 10">
+							<polygon points="0,0 10,5 0,10 "/>
+							<polygon points="10,0 20,5 10,10 "/>
+							<polygon points="20,0 30,5 20,10 "/>
+						</svg>
+					</div>
 
 				</div>
 				<div class="timeline-chart timeline-chart-day">
+					<div class="timeline-control timeline-time-hud">
+						<p><span class="timezone">Ortszeit</span> <span class="js-day"></span>. <span class="js-month"></span> 
+						<span class="js-hour"></span>:<span class="js-minute"></span></p>
+					</div>
 					<canvas id="timeline-graph" height="80px"></canvas>
-				</div>
-				<div class="timeline-time-hud">
-					<p><span class="js-day"></span>. <span class="js-month"></span> 
-					<span class="js-hour"></span>:<span class="js-minute"></span></p>
 				</div>
 			</nav>
 		</section>
@@ -70,9 +72,9 @@
 		<!-- build:js scripts/vendor.js -->
 		<!-- bower:js -->
 		<script src="../bower_components/jquery/dist/jquery.js"></script>
-		<script src="../bower_components/modestmaps-js/modestmaps.js"></script>
 		<script src="../bower_components/moment/moment.js"></script>
 		<script src="../bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.js"></script>
+		<script src="../bower_components/modestmaps-js/modestmaps.js"></script>
 		<!-- endbower -->
 		<!-- endbuild -->
 

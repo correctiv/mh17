@@ -1,5 +1,9 @@
-$timeline-height: 50px;
+$timeline-height: 55px;
+$timeline-speed-width: 90px;
+$timeline-speed-padding: 5px;
 .timeline {
+	user-select: none;
+	cursor: default;
 	position: fixed;
 	bottom: 0;
 	left: 0;
@@ -20,9 +24,16 @@ $timeline-height: 50px;
 	font: inherit;
 	padding: .5em;
 	box-sizing: border-box;
-}
-.button svg * {
-	fill: #fff;
+	cursor: pointer;
+	&:focus {
+		outline: none;
+	}
+	&:active, &.active {
+		background: darken(#c71e1e, 10%);
+	}
+	svg * {
+		fill: #ffd8c4;
+	}
 }
 .button-play-pause {
 	float: left;
@@ -36,13 +47,59 @@ $timeline-height: 50px;
 	.play-forwards { display: none; }
 	.play-backwards { display: inline-block; }
 }
+.timeline-speed {
+	position: relative;
+	background: rgba(#ccc, .3);
+	border-right: 1px solid rgba(#ccc, .35);
+	position: absolute;
+	top: 0;
+	width: $timeline-speed-width;
+	padding: 0 $timeline-speed-padding;
+	box-sizing: border-box;
+	white-space: nowrap;
+	left: $timeline-height;
+	height: $timeline-height;
+	display: table-cell;
+	svg {
+		position: absolute;
+		top: $timeline-height / 2 + 5px;
+		height: 7px;
+		margin: 0 2px;
+		* {
+			fill: #999;
+		}
+	}
+}
+.fast-forward {
+	left: 0;
+}
+.double-fast-forward {
+	right: 0;
+}
+input[type=range] {
+	position: absolute;
+	width: $timeline-speed-width - 2 * $timeline-speed-padding;
+	bottom: $timeline-height / 2;
+}
+$timeline-chart-margin-left: $timeline-height / 2 - 1px;
 .timeline-time-hud {
+	right: 50%;
+	top: $timeline-height - 38px;
 	position: absolute;
 	text-align: right;
-	right: 50%;
-	bottom: 0;
-	margin-right: - $timeline-height * .8;
-	padding-right: .2em;
+	padding: .2em;
+	margin-right: -$timeline-chart-margin-left;
+
+	.timezone {
+		display: block;
+		font-size: .8em;
+		letter-spacing: .05em;
+		text-transform: uppercase;
+		opacity: .5;
+	}
+}
+.dragging .timeline-chart {
+	cursor: grabbing;
 }
 .timeline-chart {
 	z-index: 1;
@@ -59,7 +116,7 @@ $timeline-height: 50px;
 		height: 100%;
 		left: 50%;
 		bottom: 0;
-		margin-left: $timeline-height / 2 - 1px;
+		margin-left: $timeline-chart-margin-left;
 		background-color: #666;
 		opacity: .5;
 	}
