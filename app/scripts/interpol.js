@@ -17,6 +17,10 @@ function makeNewEmpty(object) {
 var Interpol = function (points, key) {
 	var me = this;
 
+	var first = points[0];
+	var last = points[points.length-1];
+	var range = last[key]-first[key];
+
 	function mix (leftPoint, rightPoint, relativePosition) {
 		var o = makeNewEmpty(leftPoint);
 		for (var key in leftPoint) {
@@ -28,20 +32,26 @@ var Interpol = function (points, key) {
 	}
 
 	function find (value) {
-		var leftIndex = points.length - 1;
+		// No binary search, but an informed linear search
+		if (last[key] <= value) return AfterEnd;
+		if (first[0][key] >= value) return BeforeStart;
 
-		if (points[leftIndex][key] < value) return AfterEnd;
-		if (points[0][key] > value) return BeforeStart;
+		var relativeValue = (value - first[key]) / range;
+		var i = (relativeValue * points.length-1)|0;
 
-		while (leftIndex >= 0 && points[leftIndex][key] > value) leftIndex--;
+		var found = false;
+		while (!found) {
+			if (points[i+1][key] <= value) {
+				i++;
+			} else if (points[i][key] > value) {
+				i--;
+			} else {
+				found = true;
+			}
+		}
+		var relativePosition = (value - points[i][key])/(points[i+1][key] - points[i][key]);
 
-		var rightIndex = Math.min(leftIndex + 1, points.length - 1);
-
-		var deltaRightLeft = points[rightIndex][key] - points[leftIndex][key];
-		var deltaValueLeft = value - points[leftIndex][key];
-		var relativePosition = deltaValueLeft/deltaRightLeft;
-
-		return [leftIndex, rightIndex, relativePosition];
+		return [i, i+1, relativePosition];
 	}
 
 	function interpolate (value) {
