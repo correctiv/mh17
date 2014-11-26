@@ -115,6 +115,7 @@ window.M.Overlay = function (container, options) {
 		}
 
 		this.redraw = function () {
+			this.clear();
 			applyBaseStyles();
 			trigger('redraw', me);
 		}
@@ -309,8 +310,8 @@ window.M.Overlay = function (container, options) {
 	};
 
 	this.redraw = function () {
-		for (var name in layers) {
-			layers[name].redraw();
+		for (var name in parent.layers) {
+			parent.layers[name].redraw();
 		}
 	}
 

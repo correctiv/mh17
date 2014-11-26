@@ -73,6 +73,7 @@ function scalePoint (point) {
 
 map.addCallback('drawn', updateReference);
 map.addCallback('drawn', updateBounds);
+map.addCallback('drawn', overlay.redraw);
 map.addCallback('drawn', function () { drawFlights(null, true); });
 
 var nofly = overlay.addLayer('nofly');
