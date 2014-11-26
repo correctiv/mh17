@@ -90,7 +90,7 @@ $.getJSON('data/no-fly.geojson', function (FeatureCollection) {
 });
 
 var arrivedAlpha = .04;
-var underwayAlpha = .25;
+var underwayAlpha = .5;
 
 var arrived = overlay.addLayer('arrived');
 var underway = overlay.addLayer('underway');
@@ -98,17 +98,17 @@ var label = overlay.addLayer('label');
 var hotspots = overlay.addLayer('hotspots', { interactive: true });
 
 underway.setBaseStyles({
-	lineWidth: 3,
+	lineWidth: s(3),
 	lineJoin: 'round'
 });
 arrived.setBaseStyles({
-	lineWidth: 3,
+	lineWidth: s(3),
 	globalAlpha: arrivedAlpha,
 	lineJoin: 'round'
 });
 label.setBaseStyles({
 	font: s(14) + 'px ' + fontFamily,
-	lineWidth: 3,
+	lineWidth: s(3),
 	textAlign: 'right',
 	textBaseline: 'middle',
 	lineJoin: 'round',
@@ -189,6 +189,7 @@ var drawFlights = (function () {
 			// Fade out flights that are about to arrive
 			var untilArrival = Math.min(1, (flight.object.route.latest - time)/300000);
 			var alpha = arrivedAlpha + untilArrival * (underwayAlpha - arrivedAlpha);
+			alpha = Math.max(alpha, arrivedAlpha)
 			underway.ctx.save();
 			if (flight.object === hoverFlight) {
 				drawFlightLabel(flight);
@@ -196,12 +197,17 @@ var drawFlights = (function () {
 			if (flight.object.notify) {
 				drawNotificationMarker(flight);
 			}
-			underway.ctx.globalAlpha = 2*alpha;
-			drawPlaneMarker(flight);
+
 			underway.ctx.globalAlpha = alpha;
-			underway.drawLine(flight.route);
-			hotspots.drawHotspot(flight.position, 15, flight.object);
+			drawPlaneMarker(flight);
+			underway.ctx.globalAlpha = 1;
+			var centerColor = 'rgba(0,0,0,'+alpha+')';
+			var edgeColor = 'rgba(0,0,0,'+arrivedAlpha+')';
+			underway.drawFadingLine(flight.route, centerColor, edgeColor, 150);
+
 			underway.ctx.restore();
+
+			hotspots.drawHotspot(flight.position, 15, flight.object);
 		}
 		function drawArrived (flight) {
 			arrived.drawLine(flight.route);

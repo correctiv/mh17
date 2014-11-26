@@ -188,6 +188,20 @@ window.M.Overlay = function (container, options) {
 			ctx.stroke();
 		}
 
+		this.drawFadingLine = function (points, centerColor, edgeColor, radius) {
+			var last = points[points.length-1];
+			var cX = s(x(last));
+			var cY = s(y(last));
+			var grd = ctx.createRadialGradient(cX, cY, 0, cX, cY, s(radius));
+			grd.addColorStop(0.000, centerColor);
+			grd.addColorStop(1.000, edgeColor);
+			ctx.strokeStyle = grd;
+			ctx.beginPath();
+			this.moveTo(points[0]);
+			points.slice(1).forEach(this.lineTo);
+			ctx.stroke();
+		}
+
 		this.moveTo = function (point) {
 			ctx.moveTo(s(x(point)), s(y(point)));
 		}
