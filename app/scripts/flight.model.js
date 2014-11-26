@@ -37,9 +37,12 @@
 		earliest = Math.min(earliest, route.earliest);
 		latest = Math.max(latest, route.latest);
 
+		var number = flight.shift();
+
 		flights.push({
 			id: (currentId++),
-			number: flight.shift(),
+			number: number,
+			notify: (number === 'Malaysia Airlines 17'),
 			start: flight.shift(),
 			end: flight.shift(),
 			route: route

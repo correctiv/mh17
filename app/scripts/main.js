@@ -168,10 +168,13 @@ var planeMarker = $('<img src="images/plane.svg">')[0];
 function drawPlaneMarker (flight) {
 	underway.drawMarker(planeMarker, flight.position, flight.heading);
 }
-function drawMH17Marker (flight) {
+function drawNotificationMarker (flight) {
 	underway.ctx.save();
-	underway.ctx.fillColor = 'rgba(255,0,0,.5)';
+	underway.ctx.globalCompositeOperation = 'darker';
+	underway.ctx.strokeStyle = 'rgba(255,0,0,.5)';
+	underway.ctx.lineWidth = s(4);
 	underway.drawCircle(flight.position, 20);
+	underway.ctx.stroke();
 	underway.ctx.restore();
 }
 
@@ -190,8 +193,8 @@ var drawFlights = (function () {
 			if (flight.object === hoverFlight) {
 				drawFlightLabel(flight);
 			}
-			if (flight.notify) {
-				drawMH17Marker(flight);
+			if (flight.object.notify) {
+				drawNotificationMarker(flight);
 			}
 			underway.ctx.globalAlpha = 2*alpha;
 			drawPlaneMarker(flight);

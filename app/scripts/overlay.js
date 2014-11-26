@@ -199,7 +199,6 @@ window.M.Overlay = function (container, options) {
 		this.drawCircle = function (point, r) {
 			ctx.beginPath();
 			ctx.arc(s(x(point)), s(y(point)), s(r), 0, 2 * Math.PI);
-			ctx.fill();
 		}
 
 		this.drawSquarePoint = function (center, side) {
@@ -264,6 +263,7 @@ window.M.Overlay = function (container, options) {
 				];
 				ctx.fillStyle = 'rgb(' + col.join() + ')';
 				this.drawCircle(point, r);
+				this.ctx.fill();
 				hotspotIndex[col.join()] = data;
 			}
 
