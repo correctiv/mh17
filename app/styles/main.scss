@@ -1,5 +1,6 @@
 @import "timeline";
 @import "credits";
+@import "modal";
 
 body, html {
 	width: 100%;
@@ -8,6 +9,10 @@ body, html {
 body {
 	margin: 0;
 	font: 1em sans-serif;
+}
+h1, h2 {
+	font-weight: normal;
+	margin: .4em 0;
 }
 p {
 	margin: 0;
@@ -29,4 +34,7 @@ p {
 canvas {
 	width: 100%;
 	height: 100%;
+}
+.hidden {
+	display: none;
 }

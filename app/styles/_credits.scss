@@ -1,0 +1,24 @@
+.credits {
+	opacity: .6;
+	font-size: .8em;
+	position: absolute;
+	bottom: $timeline-height;
+	right: 0;
+	text-align: right;
+	padding: .2em;
+	text-shadow: 0 1px 0 #fff;
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	li {
+		display: inline;
+		white-space: nowrap;
+	}
+	li + li:before {
+		opacity: .8;
+		content: " · ";
+	}
+}

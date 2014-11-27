@@ -68,13 +68,20 @@
 			</nav>
 		</section>
 
+		<section id="embed" class="modal hidden">
+			<h2>Einbetten</h2>
+			<textarea disabled>&lt;iframe src="" frameborder="0" width="700" height="500" style="width: 100%"&gt;&lt;/iframe&gt;</textarea>
+		</section>
+
 		<footer class="credits">
 			<ul>
 				<li>Mit freundlicher Genehmigung von <a href="http://flightradar24.com/">Flightradar24.com</a></li>
 				<li>Übersicht aller Flüge</li>
-				<li>Einbetten</li>
+				<li><a href="#embed">Einbetten</a></li>
 			</ul>
 		</footer>
+
+		<div class="modal-overlay hidden"></div>
 
 		<!-- build:js scripts/vendor.js -->
 		<!-- bower:js -->
@@ -95,6 +102,7 @@
 		<script src="scripts/clock.js"></script>
 		<script src="scripts/timeline.js"></script>
 		<script src="scripts/overlay.js"></script>
+		<script src="scripts/modal.js"></script>
 		<script src="scripts/main.js"></script>
 		<!-- endbuild -->
 </body>
