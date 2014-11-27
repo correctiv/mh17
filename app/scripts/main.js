@@ -17,7 +17,7 @@ var map = new MM.Map('map-container', provider, null, [
 	// new MM.DragHandler(map),
 	// new MM.DoubleClickHandler(map),
 	// Allow smooth zooming
-	new MM.MouseWheelHandler(map).precise(true)
+	// new MM.MouseWheelHandler(map).precise(true)
 ]);
 var bounds = {
 	nw: new MM.Location(51, 41),
@@ -26,10 +26,9 @@ var bounds = {
 map.setExtent([bounds.nw , bounds.se], true);
 map.coordLimits = [
 	map.locationCoordinate(bounds.nw).zoomTo(5),
-	map.locationCoordinate(bounds.se).zoomTo(9)
+	map.locationCoordinate(bounds.se).zoomTo(12)
 ];
 provider.tileLimits = map.coordLimits;
-
 
 $window.resize(function () {
 	map.setExtent([bounds.nw , bounds.se], true);
@@ -127,8 +126,16 @@ label.setBaseStyles({
 	strokeStyle: '#fff'
 });
 
-$.getJSON('data/flights.json', M.flights.pushBulk);
+var date = M.params.date || '2014-07-17';
+$.getJSON('data/'+date+'.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);
+M.flights.on('bulkpushed', function () {
+	if (M.params.t) {
+		var time = M.params.t;
+		if (isNaN(+time)) time = new Date(time);
+		M.clock.time(+time);
+	}
+});
 M.flights.on('bulkpushed', function () {
 	// Mark the last reported position of MH17
 	var mh17 = M.flights.find('Malaysia Airlines 17')[0];
@@ -147,16 +154,18 @@ M.flights.on('bulkpushed', function () {
 			this.ctx.fillStyle = '#000';
 			this.ctx.textBaseline = 'middle';
 			this.ctx.font = s(14)+'px ' + fontFamily;
-			this.ctx.fillText('Absturz', s(15), 0);
+			this.ctx.fillText('Absturz von MH17', s(15), 0);
 		});
 	});
 });
 
 hotspots.on('mouseenter', function (flight) {
 	hoverFlight = flight;
+	if (M.clock.paused()) drawFlightLabel(flight);
 });
 hotspots.on('mouseleave', function () {
 	hoverFlight = null;
+	if (M.clock.paused()) drawFlights();
 });
 
 var hoverFlight;
@@ -225,7 +234,7 @@ var drawFlights = (function () {
 			var alpha = arrivedAlpha + untilArrival * (underwayAlpha - arrivedAlpha);
 			alpha = Math.max(alpha, arrivedAlpha)
 			underway.ctx.save();
-			if (flight.object === hoverFlight) {
+			if (hoverFlight && flight.object === hoverFlight.object) {
 				drawFlightLabel(flight);
 			}
 			if (flight.object.notify) {
@@ -241,7 +250,7 @@ var drawFlights = (function () {
 
 			underway.ctx.restore();
 
-			hotspots.drawHotspot(flight.position, 20, flight.object);
+			hotspots.drawHotspot(flight.position, 20, flight);
 		}
 		function drawArrived (flight) {
 			arrived.drawLine(flight.route);

@@ -21,10 +21,13 @@
 	overflow: auto;
 	background: #fff;
 }
-#embed textarea {
+#embed textarea,
+#embed input[type=text] {
 	font: 1em monospace;
 	border: none;
 	width: 100%;
 	padding: 0;
+}
+#embed textarea {
 	height: 4em;
 }

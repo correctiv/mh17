@@ -22,11 +22,6 @@ M.timeline = (function () {
 		fillStyle: '#000',
 		lineWidth: s(1/window.devicePixelRatio)
 	}
-	var countGraph = {
-		strokeStyle: 'rgba(0, 132, 186, .2)',
-		fillStyle: 'rgba(0, 132, 186, .1)',
-		lineWidth: defaults.lineWidth
-	}
 
 	function coordinates (/* time, [referenceTime,] layout */) {
 		var time, referenceTime, layout;
@@ -44,13 +39,6 @@ M.timeline = (function () {
 			}
 		})[layout]();
 		return coords;
-	}
-
-	function setCanvasSize (canvas, width, height) {
-		canvas.setAttribute('width', s(width));
-		canvas.setAttribute('height', s(height));
-		canvas.style.width = width + 'px';
-		canvas.style.height = height + 'px';
 	}
 
 	function timelineGraph (now, canvas) {
@@ -71,31 +59,6 @@ M.timeline = (function () {
 		var ctx = canvas.getContext('2d');
 		ctx.clearRect(0, 0, s(width), s(height));
 
-		var current = M.clock.earliest(), end = M.clock.latest();
-
-		// Draw diagram
-		var planeCounts = [];
-		while (current < end) {
-			planeCounts.push( { time: current, count: M.flights.until(current).underway.length } );
-			current += 3e5;
-		}
-		var maxPlaneCount = 30;
-		ctx.beginPath();
-		ctx.moveTo(0, s(height));
-		planeCounts.forEach(function(count) {
-			var x = coordinates(count.time, now, 'timeline').x;
-			var y = height - height * count.count / (1.2*maxPlaneCount);
-			ctx.lineTo(s(xCenter(x)), s(y));
-		});
-		ctx.lineTo(width, s(height));
-
-		ctx.strokeStyle = countGraph.strokeStyle;
-		ctx.fillStyle = countGraph.fillStyle;
-		ctx.lineWidth = countGraph.lineWidth;
-
-		ctx.stroke();
-		ctx.fill();
-
 		ctx.strokeStyle = defaults.strokeStyle;
 		ctx.fillStyle = defaults.fillStyle;
 		ctx.lineWidth = defaults.lineWidth;
@@ -104,24 +67,24 @@ M.timeline = (function () {
 		ctx.textBaseline = 'top';
 
 		// Draw ticks
-		current = moment.tz(M.clock.earliest(), M.settings.timezone).startOf('hour');
-		end = moment.tz(M.clock.latest(), M.settings.timezone);
+		var current = moment.tz(M.clock.earliest(), M.settings.timezone).startOf('hour');
+		var end = moment.tz(M.clock.latest(), M.settings.timezone);
 		while (current.isBefore(end)) {
 			var x = coordinates(current, now, 'timeline').x;
 			if (x >= 0 || x <= width) {
-				var tickHeight;
+				var tickHeight = .7 * height;
 				var h = current.hour();
 				if (h === 0) {
-					tickHeight = .2*height;
+					ctx.lineWidth = 3;
 				} else if (h === 12) {
-					tickHeight = .15*height;
+					ctx.lineWidth = 2;
 				} else {
-					tickHeight = .1*height;
+					ctx.lineWidth = 1;
 				}
-				if (h % 6 === 0) ctx.fillText(h, s(xCenter(x)), s(tickHeight));
+				if (h % 6 === 0) ctx.fillText(h, s(xCenter(x)), s(2));
 				ctx.beginPath();
-				ctx.moveTo(s(xCenter(x)), 0);
-				ctx.lineTo(s(xCenter(x)), s(tickHeight));
+				ctx.moveTo(s(xCenter(x)), s(height));
+				ctx.lineTo(s(xCenter(x)), s(height - tickHeight));
 				ctx.stroke();
 				current.add(1, 'hour');
 			}
@@ -295,6 +258,9 @@ $(function () {
 		var speed = Math.pow(parseInt($(this).val(), 10) * 0.5, 3);
 		$(document.body).toggleClass('backwards', speed < 0);
 		M.clock.speed(speed);
+	});
+	M.clock.on('init', function () {
+		$('.slider-simulation-speed').trigger('mousemove');
 	});
 	M.timeHUD.init('.timeline-time-hud');
 

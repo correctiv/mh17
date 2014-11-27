@@ -92,7 +92,7 @@ window.M.Overlay = function (container, options) {
 		this._updateDimensions = function () {
 			setHeight(o.height);
 			setStyle(o.width);
-			this.redraw();
+			// this.redraw();
 		}
 
 		function setStyle (w) {
@@ -321,6 +321,9 @@ window.M.Overlay = function (container, options) {
 	this.setDimensions = function (width, height) {
 		o.width = width;
 		o.height = height;
+		for (var name in parent.layers) {
+			parent.layers[name]._updateDimensions();
+		}
 	};
 
 	this.redraw = function () {

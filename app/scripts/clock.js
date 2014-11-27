@@ -96,6 +96,7 @@ function init (options) {
 	$.extend(o, options);
 	set(o.time.valueOf());
 	window.requestAnimationFrame(_heartbeatInterval);
+	_trigger('init');
 }
 
 /**

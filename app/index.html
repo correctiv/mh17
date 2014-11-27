@@ -49,7 +49,7 @@
 							<polygon points="0,0 10,5 0,10 "></polygon>
 							<polygon points="10,0 20,5 10,10 "></polygon>
 						</svg>
-						<input type="range" class="slider slider-simulation-speed" min="10" max="50" value="15">
+						<input type="range" class="slider slider-simulation-speed" min="10" max="50" value="10">
 						<svg class="double-fast-forward" version="1.1" x="0px" y="0px" width="30px" height="10px" viewBox="0 0 30 10" enable-background="new 0 0 30 10">
 							<polygon points="0,0 10,5 0,10 "></polygon>
 							<polygon points="10,0 20,5 10,10 "></polygon>
@@ -63,7 +63,7 @@
 						<p><span class="timezone">Ortszeit</span> <span class="js-day"></span>. <span class="js-month"></span> 
 						<span class="js-hour"></span>:<span class="js-minute"></span></p>
 					</div>
-					<canvas id="timeline-graph" height="80px"></canvas>
+					<canvas id="timeline-graph" height="55px" style="height: 55px"></canvas>
 				</div>
 			</nav>
 		</section>
@@ -91,9 +91,10 @@
 
 		<footer class="credits">
 			<ul>
-				<li>Mit freundlicher Genehmigung von <a href="http://flightradar24.com/">Flightradar24.com</a></li>
+				<li><strong>Flugdaten</strong> mit freundlicher Genehmigung von <a href="http://flightradar24.com/" target="_top">Flightradar24.com</a></li>
+				<li><strong>Kartendaten</strong> © <a href="http://openstreetmap.org/copyright" target="_top">OpenStreetMap</a> contributors</li>
 				<li><a href="#flightlist">Übersicht aller Flüge</a></li>
-				<li><a href="#embed">Einbetten</a></li>
+				<li><a href="#embed">Teilen</a></li>
 			</ul>
 		</footer>
 
@@ -119,6 +120,7 @@
 		<script src="scripts/timeline.js"></script>
 		<script src="scripts/overlay.js"></script>
 		<script src="scripts/modal.js"></script>
+		<script src="scripts/parseUrl.js"></script>
 		<script src="scripts/main.js"></script>
 		<!-- endbuild -->
 </body>
