@@ -258,7 +258,7 @@ window.M.Overlay = function (container, options) {
 		}
 
 		this.clear = function () {
-			hotspotIndex = {};
+			hotspots = [];
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 		}
 
@@ -267,34 +267,36 @@ window.M.Overlay = function (container, options) {
 			delete parent.layers[name];
 		}
 
-		var hotspotIndex = {};
+		var hotspots = [];
 		if (options.interactive) {
 			this.drawHotspot = function (point, r, data) {
-				var col = [
-					(Math.random()*256)|0,
-					(Math.random()*256)|0,
-					(Math.random()*256)|0
-				];
-				ctx.fillStyle = 'rgb(' + col.join() + ')';
-				this.drawCircle(point, r);
-				this.ctx.fill();
-				hotspotIndex[col.join()] = data;
+				hotspots.push({ x: x(point), y: y(point), r: r, data: data });
 			}
-
-			$canvas.css('opacity', 0);
 
 			var currentHoverTarget = null;
 
 			$canvas.on('mousemove mouseenter mouseleave', function (ev) {
-				var x = ev.offsetX, y = ev.offsetY;
-				col = ctx.getImageData(s(x), s(y), 1, 1).data;
-				col = [col[0], col[1], col[2]].join();
+				var mouseX = ev.offsetX, mouseY = ev.offsetY;
+				var withinRadius = hotspots.filter(function (spot) {
+					var dx = spot.x - mouseX;
+					var dy = spot.y - mouseY;
+					var dist = Math.sqrt(dx*dx + dy*dy);
 
-				if (hotspotIndex[col]) {
-					var data = hotspotIndex[col];
+					if (dist > spot.r) return false;
+					spot.dist = dist;
+					return true;
+				});
+
+				if (withinRadius.length > 0) {
+					var data = withinRadius.sort(function (a, b) {
+						return a.dist - b.dist;
+					})[0].data;
 					$canvas.css('cursor', 'pointer');
 					trigger('mousemove', data);
-					if (currentHoverTarget !== data) trigger('mouseenter', data);
+					if (currentHoverTarget !== data) {
+						trigger('mouseleave', currentHoverTarget);
+						trigger('mouseenter', data);
+					}
 					currentHoverTarget = data;
 				} else {
 					if (currentHoverTarget) trigger('mouseleave', currentHoverTarget);
