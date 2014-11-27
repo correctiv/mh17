@@ -13,17 +13,27 @@ var fontFamily = 'sans-serif';
 
 var template = 'http://tiles.odcdn.de/odcm/{Z}/{X}/{Y}.png';
 var provider = new MM.TemplatedLayer(template);
-var map = new MM.Map('map-container', provider);
+var map = new MM.Map('map-container', provider, null, [
+	// new MM.DragHandler(map),
+	// new MM.DoubleClickHandler(map),
+	// Allow smooth zooming
+	new MM.MouseWheelHandler(map).precise(true)
+]);
 var bounds = {
 	nw: new MM.Location(51, 41),
 	se: new MM.Location(46, 35)
 }
-map.setExtent([bounds.nw , bounds.se]);
-// map.coordLimits = [
-// 	map.locationCoordinate(bounds.nw).zoomTo(5),
-// 	map.locationCoordinate(bounds.se).zoomTo(12)
-// ];
+map.setExtent([bounds.nw , bounds.se], true);
+map.coordLimits = [
+	map.locationCoordinate(bounds.nw).zoomTo(5),
+	map.locationCoordinate(bounds.se).zoomTo(9)
+];
+provider.tileLimits = map.coordLimits;
 
+
+$window.resize(function () {
+	map.setExtent([bounds.nw , bounds.se], true);
+});
 
 var overlay = new M.Overlay($('#map-container'), {
 	bounds: {

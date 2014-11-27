@@ -60,7 +60,7 @@ function transform () {
 	var flights = result.hits.hits.map(function (r) { return r._source });
 
 	var bounds = {
-		n: 52, s: 45, w: 32, e: 44
+		n: 51, s: 46, w: 35-5, e: 41+5
 	}
 
 	var includeAltitude = false;
@@ -86,11 +86,21 @@ function transform () {
 
 		if (route.length === 0) return;
 
+		// EXCEPTION: MH17 is 10 minutes too long, shorten it.
+		if (flight.flight === 'MH17') {
+			var cutoffTime = +new Date(route[route.length-1][3]) - 10 * 60 * 1000;
+			route = route.filter(function (point) {
+				return (+new Date(point[3]) <= cutoffTime);
+			});
+		}
 		route = simplify(route, .01, true);
 		route.forEach(function project (pt) {
 			var x = xRel(pt), y = yRel(pt);
 			pt[0] = x;
 			pt[1] = y;
+
+			// EXCEPTION: Dates are ahead by two hours, correct them
+			pt[3] = +new Date(pt[3]) - 2 * 60 * 60 * 1000;
 		});
 		if (!includeAltitude) route = route.map(function (pt) {
 			return [pt[0], pt[1], pt[3]];
