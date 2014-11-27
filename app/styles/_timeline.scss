@@ -78,6 +78,7 @@ $timeline-speed-padding: 5px;
 }
 input[type=range] {
 	position: absolute;
+	margin: 0;
 	width: $timeline-speed-width - 2 * $timeline-speed-padding;
 	bottom: $timeline-height / 2;
 }
