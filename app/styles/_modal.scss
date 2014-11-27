@@ -8,6 +8,7 @@
 	background: rgba(#000, .3);
 }
 .modal {
+	-webkit-overflow-scrolling: touch;
 	z-index: 11;
 	position: fixed;
 	bottom: $timeline-height;
@@ -16,6 +17,8 @@
 	width: 500px;
 	box-sizing: border-box;
 	max-width: 100%;
+	max-height: 75%;
+	overflow: auto;
 	background: #fff;
 }
 #embed textarea {

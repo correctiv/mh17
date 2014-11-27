@@ -73,10 +73,26 @@
 			<textarea disabled>&lt;iframe src="" frameborder="0" width="700" height="500" style="width: 100%"&gt;&lt;/iframe&gt;</textarea>
 		</section>
 
+		<section id="flightlist" class="modal hidden">
+			<h2>Alle Flüge</h2>
+			<p>Sie können diese Übersicht auch <a href="data/flights.tsv">im TSV-Format herunterladen</a></p>
+			<table class="flight-list-table">
+				<thead>
+					<tr>
+						<th class="number">Flugnummer</th>
+						<th class="start">Von</th>
+						<th class="end">Nach</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</section>
+
 		<footer class="credits">
 			<ul>
 				<li>Mit freundlicher Genehmigung von <a href="http://flightradar24.com/">Flightradar24.com</a></li>
-				<li>Übersicht aller Flüge</li>
+				<li><a href="#flightlist">Übersicht aller Flüge</a></li>
 				<li><a href="#embed">Einbetten</a></li>
 			</ul>
 		</footer>

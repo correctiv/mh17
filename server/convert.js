@@ -1,5 +1,6 @@
 var fs = require('fs');
 var csv = require('csv');
+var util = require('util');
 var simplify = require('simplify-js');
 
 var airports = {};
@@ -44,6 +45,9 @@ fs.createReadStream('data/openflights/airlines.csv')
 })
 .on('end', done);
 
+var tsv = fs.createWriteStream('data/flights.tsv');
+tsv.write(util.format("%s\t%s\t%s\n", 'Flight', 'From', 'To'));
+
 function done () {
 	toDoCount--;
 	if (toDoCount === 0) {
@@ -56,7 +60,7 @@ function transform () {
 	var flights = result.hits.hits.map(function (r) { return r._source });
 
 	var bounds = {
-		n: 52, s: 45, w: 34, e: 42
+		n: 52, s: 45, w: 32, e: 44
 	}
 
 	var includeAltitude = false;
@@ -109,6 +113,9 @@ function transform () {
 		f.push(start);
 		f.push(end);
 		f.push(route);
+
+		if (flight.flight || start || end)
+			tsv.write(util.format("%s\t%s\t%s\n", flight.flight, start, end));
 
 		return f;
 	}).filter(function (e) { return e; });

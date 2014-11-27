@@ -23,4 +23,18 @@ $overlay.click(function () {
 	$('.modal').addClass('hidden').removeClass('visible');
 });
 
+var $tbody = $('#flightlist tbody')
+M.flights.on('bulkpushed', function () {
+	M.flights.raw.forEach(function (flight) {
+		if (!flight.start && !flight.end && !flight.number) return;
+		$tr = $('<tr>');
+		$number = $('<td>').addClass('number').text(flight.number);
+		$start = $('<td>').addClass('start').text(flight.start);
+		$end = $('<td>').addClass('end').text(flight.end);
+
+		$tr.append($number, $start, $end);
+		$tbody.append($tr);
+	});
+});
+
 });
