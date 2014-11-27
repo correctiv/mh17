@@ -42,7 +42,6 @@
 		flights.push({
 			id: (currentId++),
 			number: number,
-			notify: (number === 'Malaysia Airlines 17'),
 			start: flight.shift(),
 			end: flight.shift(),
 			route: route
@@ -79,11 +78,39 @@
 		return r;
 	}
 
+	var find = (function () {
+		var checks = {
+			is: function (actual, expected) {
+				return actual === expected;
+			},
+			matches: function (actual, regex) {
+				return actual.match(regex);
+			}
+			// (could add gt, lt, gte, lte …)
+		}
+
+		return function find (criteria) {
+			if (typeof criteria === 'string') {
+				criteria = [ [ 'number', 'is', criteria ] ];
+			}
+			var l = criteria.length;
+			return flights.filter(function (flight) {
+				for (var i=0; i<l; i++) {
+					var criterion = criteria[i];
+					val = flight[criterion[0]];
+					if (!checks[criterion[1]](val, criterion[2])) return false;
+				}
+				return true;
+			});
+		}
+	})();
+
 	module.push = push;
 	module.pushBulk = pushBulk;
 	module.until = untilTime;
 	module.raw = flights;
 	module.on = addEventListener;
+	module.find = find;
 
 	M.flights = module;
 

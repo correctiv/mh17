@@ -117,6 +117,28 @@ label.setBaseStyles({
 
 $.getJSON('data/flights.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);
+M.flights.on('bulkpushed', function () {
+	// Mark the last reported position of MH17
+	var mh17 = M.flights.find('Malaysia Airlines 17')[0];
+	mh17.notify = true;
+	var lastPoint = mh17.route.points[mh17.route.points.length - 1];
+	nofly.always(function () {
+		this.rotateTranslateDo(lastPoint, 0, function () {
+			this.ctx.globalAlpha = .5;
+			this.ctx.lineWidth = s(5);
+			this.ctx.beginPath();
+			this.ctx.moveTo(s(-8), s(-8));
+			this.ctx.lineTo(s(8), s(8));
+			this.ctx.moveTo(s(-8), s(8));
+			this.ctx.lineTo(s(8), s(-8));
+			this.ctx.stroke();
+			this.ctx.fillStyle = '#000';
+			this.ctx.textBaseline = 'middle';
+			this.ctx.font = s(14)+'px ' + fontFamily;
+			this.ctx.fillText('Absturz', s(15), 0);
+		});
+	});
+});
 
 hotspots.on('mouseenter', function (flight) {
 	hoverFlight = flight;

@@ -252,7 +252,7 @@ window.M.Overlay = function (container, options) {
 		this.rotateTranslateDo = function (point, angle, callback) {
 			ctx.save();
 			ctx.translate(s(x(point)), s(y(point)));
-			ctx.rotate(angle);
+			if (angle) ctx.rotate(angle);
 			callback.call(this, this);
 			ctx.restore();
 		}
