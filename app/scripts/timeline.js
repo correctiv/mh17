@@ -202,31 +202,28 @@ $(function () {
 	var $timeline = $('.timeline-chart');
 	var $document = $(document);
 	var dragStartX, dragStartSimTime, lastSimTime, lastRealTime, dragging = false, wasRunning;
-	$document.on('mousedown', '.timeline-chart', function (event) {
+	$document.on('movestart', '.timeline-chart', function (event) {
 		dragging = true;
 		$(document.body).addClass('dragging');
-		dragStartX = event.screenX;
 		dragStartSimTime = M.clock.time();
 		wasRunning = M.clock.running();
 		M.clock.pause();
 		inertia.stop();
 	});
-	$document.on('mousemove', function (event) {
+	$document.on('move', function (event) {
 		if (!dragging) return;
 		event.preventDefault();
-		var dX = dragStartX - event.screenX;
-		var dTime = dX * timeScale;
+		var dTime = -event.distX * timeScale;
 		lastSimTime = dragStartSimTime + dTime;
 		lastRealTime = Date.now();
 		M.clock.set(lastSimTime);
 	});
-	$document.on('mouseup', function (event) {
+	$document.on('moveend', function (event) {
 		if (!dragging) return;
 		dragging = false;
 		$(document.body).removeClass('dragging');
 
-		var dX = dragStartX - event.screenX;
-		var dTime = dX * timeScale;
+		var dTime = -event.distX * timeScale;
 		var newSimTime = dragStartSimTime + dTime;
 		var newRealTime = Date.now();
 		var dragSpeed = (newSimTime - lastSimTime)/(newRealTime - lastRealTime);

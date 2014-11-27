@@ -3,6 +3,8 @@ $(function () {
 var HALFPI = Math.PI/2;
 var $window = $(window);
 
+FastClick.attach(document.body);
+
 function s (px) {
 	return px * window.devicePixelRatio;
 }
@@ -229,7 +231,7 @@ var drawFlights = (function () {
 
 			underway.ctx.restore();
 
-			hotspots.drawHotspot(flight.position, 15, flight.object);
+			hotspots.drawHotspot(flight.position, 20, flight.object);
 		}
 		function drawArrived (flight) {
 			arrived.drawLine(flight.route);
