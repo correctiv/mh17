@@ -89,14 +89,25 @@ map.addCallback('drawn', function () { drawFlights(null, true); });
 
 var nofly = overlay.addLayer('nofly');
 nofly.setBaseStyles({
-	fillStyle: 'rgba(0,0,0,.2)'
+	fillStyle: 'rgba(0,0,0,.2)',
+	font: s(14)+'px '+fontFamily,
+	textAlign: 'center',
+	textBaseline: 'middle'
 });
 $.getJSON('data/no-fly.geojson', function (FeatureCollection) {
 	nofly.projectGeoJSON(FeatureCollection);
 	nofly.always(function () {
+		nofly.ctx.save();
 		nofly.drawGeoJSON(FeatureCollection, function (ctx) {
 			ctx.fill();
 		});
+		nofly.ctx.fillStyle = 'rgba(0,0,0,.5)';
+
+		// Hardcoding this couldn't possibly be a bad idea!
+		nofly.fillText('unterhalb 9750 m', [0.2138, 0.31], 0, 8);
+		nofly.ctx.font = 'bold ' + nofly.ctx.font;
+		nofly.fillText('Flugverbot', [0.2138, 0.31], 0, -8);
+		nofly.ctx.restore();
 	})
 });
 
@@ -109,11 +120,11 @@ var label = overlay.addLayer('label');
 var hotspots = overlay.addLayer('hotspots', { interactive: true });
 
 underway.setBaseStyles({
-	lineWidth: s(3),
+	lineWidth: s(5),
 	lineJoin: 'round'
 });
 arrived.setBaseStyles({
-	lineWidth: s(3),
+	lineWidth: s(5),
 	globalAlpha: arrivedAlpha,
 	lineJoin: 'round'
 });
@@ -152,8 +163,7 @@ M.flights.on('bulkpushed', function () {
 			this.ctx.lineTo(s(8), s(-8));
 			this.ctx.stroke();
 			this.ctx.fillStyle = '#000';
-			this.ctx.textBaseline = 'middle';
-			this.ctx.font = s(14)+'px ' + fontFamily;
+			this.ctx.textAlign = 'left';
 			this.ctx.fillText('Absturz von MH17', s(15), 0);
 		});
 	});
@@ -211,18 +221,21 @@ var planeMarker = $('<img src="images/plane.svg">')[0];
 function drawPlaneMarker (flight) {
 	underway.drawMarker(planeMarker, flight.position, flight.heading);
 }
-function drawNotificationMarker (flight) {
-	underway.ctx.save();
-	underway.ctx.globalCompositeOperation = 'darker';
-	underway.ctx.strokeStyle = 'rgba(255,0,0,.5)';
-	underway.ctx.lineWidth = s(4);
-	underway.drawCircle(flight.position, 20);
-	underway.ctx.stroke();
-	underway.ctx.restore();
+function drawNotificationMarker (flight, layer, radius) {
+	layer = layer || underway;
+	layer.ctx.save();
+	layer.ctx.globalCompositeOperation = 'darker';
+	layer.ctx.globalAlpha = 1;
+	layer.ctx.strokeStyle = 'rgba(255,0,0,.5)';
+	layer.ctx.lineWidth = s(4);
+	layer.drawCircle(flight.position, 20);
+	layer.ctx.stroke();
+	layer.ctx.restore();
 }
 
 var drawFlights = (function () {
 	var previouslyArrived = [];
+	var allowRumble = true;
 
 	return function (time, clearAll) {
 		time = M.clock.time();
@@ -241,27 +254,34 @@ var drawFlights = (function () {
 				drawNotificationMarker(flight);
 			}
 
-			underway.ctx.globalAlpha = alpha;
-			drawPlaneMarker(flight);
 			underway.ctx.globalAlpha = 1;
 			var centerColor = 'rgba(0,0,0,'+alpha+')';
 			var edgeColor = 'rgba(0,0,0,'+arrivedAlpha+')';
 			underway.drawFadingLine(flight.route, centerColor, edgeColor, 150);
+			
+			underway.ctx.globalAlpha = alpha;
+			drawPlaneMarker(flight);
 
 			underway.ctx.restore();
 
 			hotspots.drawHotspot(flight.position, 20, flight);
 		}
 		function drawArrived (flight) {
+			if (flight.object.notify) {
+				var pos = flight.object.route.points[flight.object.route.points.length-1];
+				drawNotificationMarker({ position: pos }, arrived);
+				if (allowRumble) M.rumble();
+			}
 			arrived.drawLine(flight.route);
 		}
 
 		underway.clear();
 		hotspots.clear();
 		label.clear();
-		flights.underway.forEach(drawUnderway);
 
+		flights.underway.forEach(drawUnderway);
 		if (flights.arrived.length > previouslyArrived.length && !clearAll) {
+			allowRumble = true;
 			H.array.diff(
 				previouslyArrived,
 				flights.arrived,
@@ -270,6 +290,7 @@ var drawFlights = (function () {
 		} else if (flights.arrived.length < previouslyArrived.length || clearAll) {
 			// We're going back in time!
 			arrived.clear();
+			allowRumble = false;
 			flights.arrived.forEach(drawArrived);
 		}
 		previouslyArrived = flights.arrived;

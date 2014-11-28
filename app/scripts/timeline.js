@@ -18,7 +18,7 @@ M.timeline = (function () {
 	}
 
 	var defaults = {
-		strokeStyle: '#999',
+		strokeStyle: '#ccc',
 		fillStyle: '#000',
 		lineWidth: s(1/window.devicePixelRatio)
 	}
@@ -72,7 +72,7 @@ M.timeline = (function () {
 		while (current.isBefore(end)) {
 			var x = coordinates(current, now, 'timeline').x;
 			if (x >= 0 || x <= width) {
-				var tickHeight = .7 * height;
+				var tickHeight = height;
 				var h = current.hour();
 				if (h === 0) {
 					ctx.lineWidth = 3;
@@ -81,11 +81,11 @@ M.timeline = (function () {
 				} else {
 					ctx.lineWidth = 1;
 				}
-				if (h % 6 === 0) ctx.fillText(h, s(xCenter(x)), s(2));
 				ctx.beginPath();
 				ctx.moveTo(s(xCenter(x)), s(height));
 				ctx.lineTo(s(xCenter(x)), s(height - tickHeight));
 				ctx.stroke();
+				if (h % 6 === 0) ctx.fillText(h, s(xCenter(x)), s(2));
 				current.add(1, 'hour');
 			}
 		}
