@@ -1,7 +1,10 @@
+$main-color: #c71e1e;
+
 @import "timeline";
 @import "credits";
 @import "modal";
 @import "flightlist";
+@import "rangeslider";
 
 body, html {
 	width: 100%;

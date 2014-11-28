@@ -257,7 +257,7 @@ $(function () {
 	$('.slider-simulation-speed').on('mousemove change', function () {
 		var speed = Math.pow(parseInt($(this).val(), 10) * 0.5, 3);
 		$(document.body).toggleClass('backwards', speed < 0);
-		M.clock.speed(speed);
+		try { M.clock.speed(speed); } catch (e) {}
 	});
 	M.clock.on('init', function () {
 		$('.slider-simulation-speed').trigger('mousemove');

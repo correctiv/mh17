@@ -4,6 +4,7 @@ var HALFPI = Math.PI/2;
 var $window = $(window);
 
 FastClick.attach(document.body);
+$('input[type="range"]').rangeslider({polyfill:false});
 
 function s (px) {
 	return px * window.devicePixelRatio;

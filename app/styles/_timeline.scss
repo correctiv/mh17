@@ -19,7 +19,7 @@ $timeline-speed-padding: 5px;
 .button {
 	display: inline-block;
 	border: none;
-	background: #c71e1e;
+	background: $main-color;
 	color: #ffd8c4;
 	font: inherit;
 	padding: .5em;
@@ -29,7 +29,7 @@ $timeline-speed-padding: 5px;
 		outline: none;
 	}
 	&:active, &.active {
-		background: darken(#c71e1e, 10%);
+		background: darken($main-color, 10%);
 	}
 	svg * {
 		fill: #ffd8c4;
@@ -76,11 +76,14 @@ $timeline-speed-padding: 5px;
 .double-fast-forward {
 	right: 0;
 }
-input[type=range] {
+.slider-simulation-speed, .timeline .rangeslider {
 	position: absolute;
 	margin: 0;
 	width: $timeline-speed-width - 2 * $timeline-speed-padding;
 	bottom: $timeline-height / 2;
+}
+.timeline .rangeslider {
+	bottom: $timeline-height / 2 + 5px;	
 }
 $timeline-chart-margin-left: $timeline-height / 2 - 1px;
 .timeline-time-hud {

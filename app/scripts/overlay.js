@@ -276,7 +276,8 @@ window.M.Overlay = function (container, options) {
 			var currentHoverTarget = null;
 
 			$canvas.on('mousemove mouseenter mouseleave', function (ev) {
-				var mouseX = ev.offsetX, mouseY = ev.offsetY;
+				// event.offsetX and event.offsetY are undefined in Firefox
+				var mouseX = ev.originalEvent.layerX, mouseY = ev.originalEvent.layerY;
 				var withinRadius = hotspots.filter(function (spot) {
 					var dx = spot.x - mouseX;
 					var dy = spot.y - mouseY;
