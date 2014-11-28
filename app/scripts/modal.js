@@ -7,6 +7,12 @@ $embedCodeField.val(
 
 var $overlay = $('.modal-overlay');
 
+var modalBehaviors = {
+	embed: function () {
+		$(this).find('textarea').select()
+	}
+}
+
 $('.modal').each(function (i, modal) {
 	var $modal = $(modal);
 	$('[href=#'+modal.id+']').each(function (j, anchor) {
@@ -14,6 +20,7 @@ $('.modal').each(function (i, modal) {
 			ev.preventDefault();
 			$modal.addClass('visible').removeClass('hidden');
 			$overlay.addClass('visible').removeClass('hidden');
+			if (modalBehaviors[modal.id]) modalBehaviors[modal.id].call(modal, ev);
 		});
 	});
 });

@@ -22,3 +22,11 @@
 		content: " · ";
 	}
 }
+.link-correctiv {
+	span {
+		display: none;
+	}
+	&:after {
+		content: "Correct!v";
+	}
+}

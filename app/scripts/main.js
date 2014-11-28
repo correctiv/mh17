@@ -105,7 +105,8 @@ $.getJSON('data/no-fly.geojson', function (FeatureCollection) {
 		nofly.ctx.fillStyle = 'rgba(0,0,0,.5)';
 
 		// Hardcoding this couldn't possibly be a bad idea!
-		nofly.fillText('unterhalb 9750 m', [0.2138, 0.31], 0, 8);
+		var heightString = (M.params.date === '2014-07-24')? 'im gesamten Luftraum' : 'unterhalb 9750 m';
+		nofly.fillText(heightString, [0.2138, 0.31], 0, 8);
 		nofly.ctx.font = 'bold ' + nofly.ctx.font;
 		nofly.fillText('Flugverbot', [0.2138, 0.31], 0, -8);
 		nofly.ctx.restore();
@@ -139,6 +140,7 @@ label.setBaseStyles({
 });
 
 var date = M.params.date || '2014-07-17';
+$('.js-date-'+date).addClass('selected');
 $.getJSON('data/'+date+'.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);
 M.flights.on('bulkpushed', function () {

@@ -3,12 +3,15 @@ var csv = require('csv');
 var util = require('util');
 var simplify = require('simplify-js');
 
+var src = 'data/raw/';
+var dest = '../app/data/';
+
 var airports = {};
 var airlines = {};
 
 var toDoCount = 3;
 
-fs.createReadStream('data/openflights/airports.csv')
+fs.createReadStream('data/lib/openflights/airports.csv')
 .pipe(csv.parse())
 .on('readable', function () {
 	while (row = this.read()) {
@@ -19,7 +22,7 @@ fs.createReadStream('data/openflights/airports.csv')
 
 // We'll use both the IATA database and OpenFlights.
 // IATA is more reliable, OpenFlights is more complete.
-fs.createReadStream('data/iata-airlines.tsv')
+fs.createReadStream('data/lib/iata-airlines.tsv')
 .pipe(csv.parse({ delimiter: "\t" }))
 .on('readable', function () {
 	while (row = this.read()) {
@@ -33,7 +36,7 @@ fs.createReadStream('data/iata-airlines.tsv')
 })
 .on('end', done);
 
-fs.createReadStream('data/openflights/airlines.csv')
+fs.createReadStream('data/lib/openflights/airlines.csv')
 .pipe(csv.parse())
 .on('readable', function () {
 	while (row = this.read()) {
@@ -45,18 +48,16 @@ fs.createReadStream('data/openflights/airlines.csv')
 })
 .on('end', done);
 
-var tsv = fs.createWriteStream('data/flights.tsv');
-tsv.write(util.format("%s\t%s\t%s\n", 'Flight', 'From', 'To'));
-
 function done () {
 	toDoCount--;
 	if (toDoCount === 0) {
-		transform();
+		var files = fs.readdirSync(src).filter(function (filename) { return filename.match(/\.json$/); });
+		files.forEach(transform);
 	}
 }
 
-function transform () {
-	var result = JSON.parse(fs.readFileSync('data/raw.json'));
+function transform (filename) {
+	var result = JSON.parse(fs.readFileSync(src + filename));
 	var flights = result.hits.hits.map(function (r) { return r._source });
 
 	var bounds = {
@@ -65,7 +66,15 @@ function transform () {
 
 	var includeAltitude = false;
 
+	var origBounds = { lat: { }, lon: { } }
+
 	function checkBounds (point) {
+
+		if (!origBounds.lat.min || origBounds.lat.min > point[1]) origBounds.lat.min = point[1];
+		if (!origBounds.lat.max || origBounds.lat.max < point[1]) origBounds.lat.max = point[1];
+		if (!origBounds.lon.min || origBounds.lon.min > point[0]) origBounds.lon.min = point[0];
+		if (!origBounds.lon.max || origBounds.lon.max < point[0]) origBounds.lon.max = point[0];
+
 		return (
 			point[0] >= bounds.w && point[0] <= bounds.e &&
 			point[1] >= bounds.s && point[1] <= bounds.n
@@ -74,6 +83,9 @@ function transform () {
 
 	function xRel (l) { return l[0] / 180; }
 	function yRel (l) { return Math.log(Math.tan(Math.PI/4+l[1]*(Math.PI/180)/2)) / Math.PI; }
+
+	var tsv = fs.createWriteStream(dest + filename.replace(/\.json$/, '.tsv'));
+	tsv.write(util.format("%s\t%s\t%s\n", 'Flight', 'From', 'To'));
 
 	flights = flights.map(function (flight) {
 		var f = [];
@@ -131,6 +143,7 @@ function transform () {
 	}).filter(function (e) { return e; });
 
 	var s = JSON.stringify(flights);
-	fs.writeFileSync('data/flights.json', s);
+	fs.writeFileSync(dest + filename, s);
 	console.log(Math.round(s.length / 1000) + ' kB');
+	console.log('Original bounds: ', origBounds);
 }

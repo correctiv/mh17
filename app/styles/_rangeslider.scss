@@ -1,12 +1,12 @@
 $slider-height: 4px;
-$handle-height: 18px;
+$handle-height: 16px;
 
 .rangeslider,
 .rangeslider__fill {
   background: #e6e6e6;
   display: block;
   height: $slider-height;
-  width: 100%;
+  width: $slider-height;
   box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
   border-radius: $slider-height / 2;
 }

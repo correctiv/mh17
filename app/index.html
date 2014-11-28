@@ -21,6 +21,14 @@
 	</head>
 	<body>
 
+		<header>
+			<h1>Schutzschild über der Ostukraine</h1>
+			<nav class="select-day">
+				<li><a href="./" class="js-date-2014-07-17" title="Alle Flüge am 17. Juli 2014 anzeigen">17. Juli</a></li>
+				<li><a href="./?date=2014-07-24" class="js-date-2014-07-24" title="Alle Flüge am 24. Juli 2014 anzeigen">24. Juli</a></li>
+			</nav>
+		</header>
+
 		<div id="map-container"></div>
 
 		<section class="timeline">
@@ -65,7 +73,7 @@
 
 		<section id="embed" class="modal hidden">
 			<h2>Einbetten</h2>
-			<textarea disabled>&lt;iframe src="" frameborder="0" width="700" height="500" style="width: 100%"&gt;&lt;/iframe&gt;</textarea>
+			<textarea readonly>&lt;iframe src="" frameborder="0" width="700" height="500" style="width: 100%"&gt;&lt;/iframe&gt;</textarea>
 		</section>
 
 		<section id="flightlist" class="modal hidden">
@@ -86,10 +94,11 @@
 
 		<footer class="credits">
 			<ul>
+				<li>Ein Projekt von <a href="https://correctiv.org/" class="link-correctiv"><span>Correctiv</span></a> und <a href="https://opendatacity.de/">OpenDataCity</a></li>
 				<li><strong>Flugdaten</strong> mit freundlicher Genehmigung von <a href="http://flightradar24.com/" target="_top">Flightradar24.com</a></li>
 				<li><strong>Kartendaten</strong> © <a href="http://openstreetmap.org/copyright" target="_top">OpenStreetMap</a> contributors</li>
 				<li><a href="#flightlist">Übersicht aller Flüge</a></li>
-				<li><a href="#embed">Teilen</a></li>
+				<li><a href="#embed">Einbetten</a></li>
 			</ul>
 		</footer>
 

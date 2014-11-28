@@ -5,6 +5,7 @@ $main-color: #c71e1e;
 @import "modal";
 @import "flightlist";
 @import "rangeslider";
+@import "header";
 
 body, html {
 	width: 100%;
@@ -41,4 +42,7 @@ canvas {
 }
 .hidden {
 	display: none;
+}
+a {
+	text-decoration: none;
 }
