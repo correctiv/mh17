@@ -59,6 +59,7 @@ function done () {
 function transform (filename) {
 	var result = JSON.parse(fs.readFileSync(src + filename));
 	var flights = result.hits.hits.map(function (r) { return r._source });
+	console.log(flights.length);
 
 	var bounds = {
 		n: 51, s: 46, w: 35-5, e: 41+5
@@ -66,15 +67,7 @@ function transform (filename) {
 
 	var includeAltitude = false;
 
-	var origBounds = { lat: { }, lon: { } }
-
 	function checkBounds (point) {
-
-		if (!origBounds.lat.min || origBounds.lat.min > point[1]) origBounds.lat.min = point[1];
-		if (!origBounds.lat.max || origBounds.lat.max < point[1]) origBounds.lat.max = point[1];
-		if (!origBounds.lon.min || origBounds.lon.min > point[0]) origBounds.lon.min = point[0];
-		if (!origBounds.lon.max || origBounds.lon.max < point[0]) origBounds.lon.max = point[0];
-
 		return (
 			point[0] >= bounds.w && point[0] <= bounds.e &&
 			point[1] >= bounds.s && point[1] <= bounds.n
@@ -145,5 +138,4 @@ function transform (filename) {
 	var s = JSON.stringify(flights);
 	fs.writeFileSync(dest + filename, s);
 	console.log(Math.round(s.length / 1000) + ' kB');
-	console.log('Original bounds: ', origBounds);
 }
