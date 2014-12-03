@@ -22,6 +22,9 @@
 	background: #fff;
 	line-height: 1.3;
 }
+p + p {
+	margin-top: .8em;
+}
 #embed textarea,
 #embed input[type=text] {
 	font: 1em monospace;
