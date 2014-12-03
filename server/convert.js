@@ -74,20 +74,30 @@ function transform (filename) {
 		);
 	}
 
+	function checkDuration (flight) {
+		// Discard all flights shorter than 10 minutes
+		var duration = new Date(flight.profile[flight.profile.length-1].t)
+			- new Date(flight.profile[0].t);
+		return (duration >= 10 * 60 * 1000);
+	}
+
 	function xRel (l) { return l[0] / 180; }
 	function yRel (l) { return Math.log(Math.tan(Math.PI/4+l[1]*(Math.PI/180)/2)) / Math.PI; }
 
 	var tsv = fs.createWriteStream(dest + filename.replace(/\.json$/, '.tsv'));
 	tsv.write(util.format("%s\t%s\t%s\n", 'Flight', 'From', 'To'));
 
-	flights = flights.map(function (flight) {
+	flights = flights
+	.filter(checkDuration)
+	.map(function (flight) {
 		var f = [];
 		var route = flight.route.coordinates.map(function (point, i) {
 			var profilePoint = flight.profile[i];
 			// { q: 'squawk', h: heading, s: groundSpeed, t: 'time', a: altitude }
 			var altitude = profilePoint.a * includeAltitude;
 			return [point[0], point[1], altitude, profilePoint.t];
-		}).filter(checkBounds);
+		})
+		.filter(checkBounds);
 
 		if (route.length === 0) return;
 

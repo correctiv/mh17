@@ -1,4 +1,5 @@
 .credits {
+	$bg: rgba(#fff, .5);
 	opacity: .6;
 	font-size: .8em;
 	position: absolute;
@@ -7,6 +8,7 @@
 	text-align: right;
 	padding: .2em;
 	text-shadow: 0 1px 0 #fff;
+	background: $bg;
 
 	ul {
 		list-style: none;
@@ -21,6 +23,36 @@
 		opacity: .8;
 		content: " · ";
 	}
+	@media screen and (max-width: 500px) {
+		background: none;
+		ul {
+			display: none;
+		}
+		li {
+			white-space: normal;
+		}
+		&:after {
+			display: inline-block;
+			width: 1.2em;
+			height: 1.2em;
+			border-radius: 50%;
+			background: rgba(#000, .2);
+			text-align: center;
+			font: 2em serif;
+			font-style: italic;
+			margin: .2em;
+			content: "i";
+		}
+		&:hover {
+			background: $bg;
+			ul {
+				display: block;
+			}
+			&:after {
+				display: none;
+			}
+		}
+	}
 }
 .link-correctiv {
 	span {
@@ -28,5 +60,8 @@
 	}
 	&:after {
 		content: "Correct!v";
+		text-transform: uppercase;
+		font-size: .85em;
+		letter-spacing: .02em;
 	}
 }

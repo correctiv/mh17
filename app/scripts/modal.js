@@ -25,6 +25,11 @@ $('.modal').each(function (i, modal) {
 	});
 });
 
+$('body').on('movestart', '.modal', function (ev) {
+	// Otherwise modals wouldn't be able to scroll on touch devices
+	ev.preventDefault();
+});
+
 $overlay.click(function () {
 	$overlay.addClass('hidden').removeClass('visible');
 	$('.modal').addClass('hidden').removeClass('visible');
@@ -42,6 +47,12 @@ M.flights.on('bulkpushed', function () {
 		$tr.append($number, $start, $end);
 		$tbody.append($tr);
 	});
+});
+
+$('.credits').on('touchstart', function (ev) {
+	// Fixes a bug that would cause the collapsed credits bar on touch devices
+	// to fire a click on the link under the touch target immediately
+	if (ev.target === this) return false;
 });
 
 });

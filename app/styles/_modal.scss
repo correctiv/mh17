@@ -10,7 +10,7 @@
 .modal {
 	-webkit-overflow-scrolling: touch;
 	z-index: 11;
-	position: fixed;
+	position: absolute;
 	bottom: $timeline-height;
 	padding: .5em;
 	right: 0;

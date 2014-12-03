@@ -105,7 +105,7 @@ $.getJSON('data/no-fly.geojson', function (FeatureCollection) {
 		nofly.ctx.fillStyle = 'rgba(0,0,0,.5)';
 
 		// Hardcoding this couldn't possibly be a bad idea!
-		var heightString = (M.params.date === '2014-07-24')? 'im gesamten Luftraum' : 'unterhalb 9750 m';
+		var heightString = (M.params.date === '2014-07-24')? '' : 'unterhalb 9750 m';
 		nofly.fillText(heightString, [0.2138, 0.31], 0, 8);
 		nofly.ctx.font = 'bold ' + nofly.ctx.font;
 		nofly.fillText('Flugverbot', [0.2138, 0.31], 0, -8);
