@@ -139,7 +139,8 @@ label.setBaseStyles({
 	strokeStyle: '#fff'
 });
 
-var date = M.params.date || '2014-07-17';
+M.params.date = M.params.date || '2014-07-17';
+var date = M.params.date;
 $('.js-date-'+date).addClass('selected');
 $.getJSON('data/'+date+'.json', M.flights.pushBulk);
 M.flights.on('bulkpushed', M.clock.init);

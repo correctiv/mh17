@@ -86,7 +86,7 @@
 
 		<section id="flightlist" class="modal hidden">
 			<h2>Alle Flüge</h2>
-			<p>Sie können diese Übersicht auch <a href="data/flights.tsv">im TSV-Format herunterladen</a></p>
+			<p>Sie können diese Übersicht auch <a href="" class="js-download-tsv">im TSV-Format herunterladen</a></p>
 			<table class="flight-list-table">
 				<thead>
 					<tr>
@@ -102,9 +102,12 @@
 
 		<section id="about" class="modal hidden">
 			<h2>Über unsere Daten</h2>
-			<p>Die Daten in dieser Grafik entsprechen nicht ganz unseren Vorstellungen von Nachvollziehbarkeit, Korrektheit und Vollständigkeit – mehr dazu unten. Wir haben uns trotzdem entschlossen, die Grafik zu veröffentlichen, weil wir sicher sind, dass sie insgesamt ein zutreffendes Bild des Luftraumes über der Ostukraine am 17. und 24. Juli 2014 ergibt.</p>
-			<h3>Woher komen die Daten, und warum sind wir nicht ganz zufrieden?</h3>
-			<p>Wir haben (mit freundlicher Genehmigung) die Rohdaten von Flightradar24.com archiviert und für die Karte ausgewertet – rund 60 Millionen Positionsdaten für diese beiden Tage. Wir haben nicht die technische oder organisatorische Möglichkeit, diese Punkte einzeln zu prüfen. Wir haben aber großes Vertrauen, dass fast alle diese Positionsmeldungen verlässlich sind. Wir möchten trotzdem de möglichen Fehlerquellen kurz skizzieren, damit sich unsere Nutzer ein Bild machen können: Flightradar24.com ist eine Community, die überall auf der Welt Empfänger betreibt, um die Positionsmeldungen von Fluzgzeugen einzusammeln. Diese automatischen Poitionsmeldungen  (Fachbegriff: ADS-B) senden die meinsten zivilen Flugzeuge, zum Beispiel, um Fluglotsen die Arbeit zu erleichtern und Kollisionsgefahr zu erkennen. Flugeuge, die absichtlich falsche Positionen senden, sind also extrem selten (weil sich die Piloten damit selbst gefährden würden). Es gibt aber mehrere Möglichkeiten, warum eine gesendete Position nicht auf der Karte von Flightradar24 (und damit auch nicht bei uns) ankommt (Empfang gestört, Internet-Leitung zwischen Empfänger und FR24 gestört, Daten-Schluckauf bei FR24, Daten-Schluckauf bei uns). An einigen Stellen berechnet FR24 eine Flugzeugposition, die nie gesendet wurde, um Empfangslücken auszugleichen und die Kartendarstellung zu verschönern. Theoretisch gäbe es auch die Möglichkeit, Flightradar24 zu unterwandern und erfundene Positionsdaten ins System einzuspeisen (genauso theoretisch wie die Möglichkeit, dass jemand in unsere Datenspeicher einbricht und dort das Archiv manipuliert).</p>
+			<p>Die Daten in dieser Grafik entsprechen nicht ganz unseren Vorstellungen. Sie sind schwer nachzuvollziehen und manchmal sind sie schlicht nicht korrekt oder vollständig. Wir haben uns trotzdem entschlossen, die Grafik zu veröffentlichen, weil wir sicher sind, dass sie insgesamt ein zutreffendes Bild des Luftraumes über der Ostukraine am 17. und 24. Juli 2014 ergibt.</p>
+			<h3>Woher kommen die Daten und warum sind wir nicht ganz zufrieden?</h3>
+			<p>Wir haben mit freundlicher Genehmigung die Rohdaten von Flightradar24.com (FH24) archiviert und für die Karte ausgewertet – rund 60 Millionen Positionsdaten für diese beiden Tage. Wir haben nicht die technische oder organisatorische Möglichkeit, diese Punkte einzeln zu prüfen. Wir haben aber großes Vertrauen, dass fast alle diese Positionsmeldungen verlässlich sind. Wir möchten trotzdem die möglichen Fehlerquellen kurz skizzieren, damit sich die Nutzer ein Bild machen können:
+			<p>FH24 ist eine Community, die überall auf der Welt Empfänger betreibt, um die Positionsmeldungen von Flugzeugen einzusammeln. Diese automatischen Positionsmeldungen (Fachbegriff: ADS-B) senden die meisten zivilen Flugzeuge, um bspw. Fluglotsen die Arbeit zu erleichtern und Kollisionsgefahren zu erkennen. Flugzeuge, die absichtlich falsche Positionen senden, sind also extrem selten. </p>
+			<p>Es gibt aber Möglichkeiten, warum eine gesendete Position nicht auf der Karte von FH24, und damit auch nicht bei uns, ankommt: Empfang gestört, Internet-Leitung zwischen Empfänger und FR24 gestört, Daten-Schluckauf bei FR24, Daten-Schluckauf bei uns. Zudem berechnet FH24 an einigen Stellen Flugzeugpositionen, die nie gesendet wurde, um Empfangslücken auszugleichen und die Kartendarstellung zu verschönern.</p>
+			<p>Theoretisch gäbe es auch die Möglichkeit, Flightradar24 zu unterwandern und erfundene Positionsdaten ins System einzuspeisen.</p>
 		</section>
 
 		<footer class="credits">

@@ -46,6 +46,8 @@ M.flights.on('bulkpushed', function () {
 
 		$tr.append($number, $start, $end);
 		$tbody.append($tr);
+
+		$('.js-download-tsv').attr('href', 'data/' + M.params.date + '.tsv');
 	});
 });
 
