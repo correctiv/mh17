@@ -5,11 +5,12 @@ $timeline-speed-padding: 5px;
 	user-select: none;
 	cursor: default;
 	position: fixed;
-	bottom: 0;
+	top: 0;
 	left: 0;
 	width: 100%;
 	height: $timeline-height;
 	background: rgba(#fff, .8);
+	overflow: hidden;
 }
 .timeline-buttons {
 	z-index: 2;
