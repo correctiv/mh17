@@ -222,7 +222,15 @@ window.M.Overlay = function (container, options) {
 		this.drawMarker = function (image, point, angle) {
 			if (angle) {
 				this.rotateTranslateDo(point, angle, function () {
-					ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
+					// We should technically wait for the image to load, but as it's such a
+					// tiny svg and it will be drawn several times a second, it hardly matters
+					// if it's not there in the first few frames. We need to catch the error
+					// though because Firefox will otherwise refuse to draw anything ever
+					try {
+						ctx.drawImage(image, s(image.width/-2), s(image.height/-2), s(image.width), s(image.height));
+					} catch (e) {
+						if (e.name !== 'NS_ERROR_NOT_AVAILABLE') throw e;
+					}
 				});
 			} else {
 			}
