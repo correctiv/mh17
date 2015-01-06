@@ -12,7 +12,7 @@ function s (px) {
 
 var fontFamily = 'sans-serif';
 
-var template = '//tiles.odcdn.de/mh17/{Z}/{X}/{Y}.png';
+var template = '/mh17/images/tiles/{Z}/{X}/{Y}.png';
 var provider = new MM.TemplatedLayer(template);
 var map = new MM.Map('map-container', provider, null, [
 	// new MM.DragHandler(map),
@@ -70,7 +70,7 @@ function updateBounds () {
 }
 
 function unscalePoint (point) {
-	return [ 
+	return [
 		reference.origin.x + reference.delta.x * point[0],
 		reference.origin.y - reference.delta.y * point[1]
 	];
@@ -262,7 +262,7 @@ var drawFlights = (function () {
 			var centerColor = 'rgba(0,0,0,'+alpha+')';
 			var edgeColor = 'rgba(0,0,0,'+arrivedAlpha+')';
 			underway.drawFadingLine(flight.route, centerColor, edgeColor, 150);
-			
+
 			underway.ctx.globalAlpha = alpha;
 			drawPlaneMarker(flight);
 
