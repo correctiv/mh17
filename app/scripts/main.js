@@ -12,7 +12,7 @@ function s (px) {
 
 var fontFamily = 'sans-serif';
 
-var template = 'http://tiles.odcdn.de/odcm/{Z}/{X}/{Y}.png';
+var template = '//tiles.odcdn.de/mh17/{Z}/{X}/{Y}.png';
 var provider = new MM.TemplatedLayer(template);
 var map = new MM.Map('map-container', provider, null, [
 	// new MM.DragHandler(map),
