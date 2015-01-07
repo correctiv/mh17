@@ -70,7 +70,7 @@ function updateBounds () {
 }
 
 function unscalePoint (point) {
-	return [ 
+	return [
 		reference.origin.x + reference.delta.x * point[0],
 		reference.origin.y - reference.delta.y * point[1]
 	];
@@ -149,6 +149,9 @@ M.flights.on('bulkpushed', function () {
 		var time = M.params.t;
 		if (isNaN(+time)) time = new Date(time);
 		M.clock.time(+time);
+	}
+	if (M.params.paused) {
+		$('#button-play-pause').click();
 	}
 });
 M.flights.on('bulkpushed', function () {
@@ -262,7 +265,7 @@ var drawFlights = (function () {
 			var centerColor = 'rgba(0,0,0,'+alpha+')';
 			var edgeColor = 'rgba(0,0,0,'+arrivedAlpha+')';
 			underway.drawFadingLine(flight.route, centerColor, edgeColor, 150);
-			
+
 			underway.ctx.globalAlpha = alpha;
 			drawPlaneMarker(flight);
 
